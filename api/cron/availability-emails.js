@@ -66,7 +66,7 @@ function createAvailabilityReminderEmail(userName, userEmail, availableDate, pro
           </p>
         </div>
         <div class="footer">
-          <p>© 2025 Spective Talent Flow. All rights reserved.</p>
+          <p>© 2025 Spective. All rights reserved.</p>
         </div>
       </div>
     </body>

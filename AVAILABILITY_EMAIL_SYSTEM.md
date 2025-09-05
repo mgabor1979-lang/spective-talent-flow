@@ -2,7 +2,7 @@
 
 ## Áttekintés
 
-Ez a dokumentum leírja a Spective Talent Flow alkalmazás availability email reminder rendszerét, amely automatikusan kezeli a szakemberek elérhetőségi emlékeztetőit.
+Ez a dokumentum leírja a Spective alkalmazás availability email reminder rendszerét, amely automatikusan kezeli a szakemberek elérhetőségi emlékeztetőit.
 
 ## Rendszer Összetevők
 

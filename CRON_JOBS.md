@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the automated background jobs (cron jobs) that run in the Spective Talent Flow application.
+This document describes the automated background jobs (cron jobs) that run in the Spective  application.
 
 ## Availability Email Reminder Cron Job
 

@@ -188,7 +188,7 @@ app.post("/api/delete-user", async (req, res) => {
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Spective Talent Flow</title>
+    <title>Spective</title>
   </head>
   <body>
     <div id="root"></div>

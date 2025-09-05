@@ -1,101 +1,223 @@
-# Welcome to your Lovable project
+# Spective
 
-## Project info
+A comprehensive talent management platform that connects professionals with companies in the automotive and manufacturing industries.
 
-**URL**: https://lovable.dev/projects/7b18c785-f101-419f-afe4-c039dd314091
+## 🌟 Overview
 
-## How can I edit this code?
+Spective is a modern web application built to facilitate connections between skilled professionals and companies seeking specialized talent. The platform serves as a bridge for interim managers, consultants, and industry experts to showcase their expertise while enabling companies to discover and connect with the right talent for their transformation projects.
 
-There are several ways of editing your application.
+## 🚀 Key Features
 
-**Use Lovable**
+### For Professionals
+- **Profile Management**: Comprehensive skill showcasing, work experience, education, and technology expertise
+- **Availability Management**: Set availability dates and receive automated reminders
+- **Document Management**: Upload and manage professional documents
+- **Real-time Notifications**: Email notifications for profile status updates
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7b18c785-f101-419f-afe4-c039dd314091) and start prompting.
+### For Companies
+- **Professional Discovery**: Advanced search and filtering capabilities
+- **Company Dashboard**: Browse professional profiles with privacy-protected data
+- **Favorites System**: Save and manage preferred professionals
+- **Contact Management**: Streamlined communication with potential hires
+- **Distance Calculations**: Location-based professional matching
 
-Changes made via Lovable will be committed automatically to this repo.
+### For Administrators
+- **User Management**: Approve/reject professional and company profiles
+- **Content Moderation**: Manage platform content and user interactions
+- **Email System**: Automated notification workflows
+- **Analytics Dashboard**: Monitor platform usage and engagement
 
-**Use your preferred IDE**
+## 🛠️ Technology Stack
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Frontend
+- **React 18** with TypeScript
+- **Vite** for fast development and building
+- **Tailwind CSS** for styling
+- **shadcn/ui** for component library
+- **React Router** for navigation
+- **React Hook Form** for form management
+- **Tanstack Query** for state management
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Backend & Database
+- **Supabase** for authentication and database
+- **PostgreSQL** with Row Level Security (RLS)
+- **Real-time subscriptions** for live updates
 
-Follow these steps:
+### Email & Notifications
+- **Resend** for email delivery
+- **Comprehensive email templates** for all user interactions
+- **Automated cron jobs** for scheduled notifications
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Deployment & Infrastructure
+- **Vercel** for hosting and serverless functions
+- **Vercel Cron Jobs** for automated tasks
+- **Environment-based configuration**
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 📦 Installation & Setup
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Prerequisites
+- Node.js 18+ (recommended: install with [nvm](https://github.com/nvm-sh/nvm))
+- npm or yarn package manager
+- Supabase account and project
+- Resend account for email services
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### Local Development
 
-# Step 5 (Optional): Start the email server and cron jobs
-npm run dev:full  # Starts frontend, email API, and cron jobs
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/mgabor1979-lang/spective-talent-flow.git
+   cd spective-talent-flow
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   Create a `.env.local` file with:
+   ```bash
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_API_URL=http://localhost:8080
+   RESEND_API_KEY=your_resend_api_key
+   RESEND_FROM_EMAIL=noreply@yourdomain.com
+   ```
+
+4. **Start the development servers**
+   ```bash
+   # Frontend only
+   npm run dev
+
+   # Email API only
+   npm run dev:api
+
+   # Both frontend and email API
+   npm run dev:full
+   ```
+
+## 📋 Available Scripts
+
+- `npm run dev` - Start the frontend development server
+- `npm run dev:api` - Start the email server only
+- `npm run dev:full` - Start both frontend and email API
+- `npm run build` - Build for production
+- `npm run build:ssr` - Build with server-side rendering
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+
+## 🗄️ Project Structure
+
+```
+src/
+├── components/           # React components
+│   ├── admin/           # Admin panel components
+│   ├── auth/            # Authentication forms
+│   ├── company/         # Company-specific components
+│   ├── layout/          # Layout and navigation
+│   ├── profile/         # Professional profiles
+│   ├── registration/    # User registration flows
+│   └── ui/              # shadcn/ui base components
+├── hooks/               # Custom React hooks
+├── integrations/        # External service integrations
+├── lib/                 # Utilities and services
+│   ├── email-service.ts # Email functionality
+│   ├── email-templates.ts # Email templates
+│   └── utils.ts         # Helper functions
+├── pages/               # Page components
+└── App.tsx              # Main application
+
+api/                     # Vercel serverless functions
+├── cron/               # Scheduled jobs
+└── *.js                # API endpoints
+
+supabase/               # Database configuration
+├── migrations/         # Database schema changes
+└── config.toml         # Supabase settings
 ```
 
-## Available Scripts
+## 🔄 Automated Systems
 
-- `npm run dev` - Start the development server
-- `npm run dev:api` - Start the email server only  
-- `npm run dev:full` - Start everything (frontend + email API)
-- `npm run build` - Build the project for production
+### Email Notifications
+The platform includes comprehensive email automation:
+- Welcome emails for new users
+- Profile approval/rejection notifications
+- Availability reminder emails
+- Password reset and verification emails
 
-## Vercel Cron Jobs
+### Cron Jobs
+- **Daily availability checks** (6:00 AM UTC)
+- **Automated profile status updates**
+- **Email queue processing**
 
-This project includes **Vercel Cron Jobs** for automated email processing:
+## 🚀 Deployment
 
-- **Availability Email Reminders**: Runs daily at 6:00 AM UTC
-- Processes pending availability reminder emails
-- Automatically updates professional profiles when availability dates arrive
-- **Serverless**: No additional infrastructure needed
+### Vercel Deployment
 
-For detailed deployment information, see [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md).
+1. **Connect to Vercel**
+   - Import the GitHub repository to Vercel
+   - Configure environment variables in Vercel dashboard
 
-### Testing Cron Jobs
+2. **Environment Variables**
+   ```bash
+   SUPABASE_URL=your_production_supabase_url
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   RESEND_API_KEY=your_resend_api_key
+   RESEND_FROM_EMAIL=noreply@yourdomain.com
+   CRON_SECRET=your_random_secret_string
+   ```
 
-After deployment to Vercel, test the cron job manually:
+3. **Deploy**
+   - Push to main branch triggers automatic deployment
+   - Vercel cron jobs are automatically configured
+
+For detailed deployment instructions, see [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md).
+
+## 🧪 Testing
+
+### API Testing
+Test the cron job functionality:
 ```
 https://your-app.vercel.app/api/test-cron
 ```
 
-**Edit a file directly in GitHub**
+### Email Testing
+Use the built-in email testing component available to administrators.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📚 Documentation
 
-**Use GitHub Codespaces**
+- [Email System Guide](./EMAIL_SERVICE_GUIDE.md)
+- [Cron Jobs Documentation](./CRON_JOBS.md)
+- [Company File Management](./COMPANY_FILE_MANAGEMENT.md)
+- [Document Management](./DOCUMENT_MANAGEMENT.md)
+- [Distance Caching Implementation](./DISTANCE_CACHING_IMPLEMENTATION.md)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🔒 Security Features
 
-## What technologies are used for this project?
+- **Row Level Security (RLS)** on all database tables
+- **User authentication** with Supabase Auth
+- **Role-based access control** (Professional, Company, Admin)
+- **Data privacy protection** for professional profiles
+- **Secure file upload** and document management
 
-This project is built with:
+## 🤝 Contributing
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## How can I deploy this project?
+## 📄 License
 
-Simply open [Lovable](https://lovable.dev/projects/7b18c785-f101-419f-afe4-c039dd314091) and click on Share -> Publish.
+This project is proprietary software owned by Spective Kft.
 
-## Can I connect a custom domain to my Lovable project?
+## 📞 Support
 
-Yes, you can!
+For support and inquiries, contact:
+- Email: support@spective-talent-flow.com
+- Website: [https://spective.hu](https://spective.hu)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+---
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+© 2025 Spective Kft. All rights reserved.

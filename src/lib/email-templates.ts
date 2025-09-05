@@ -35,7 +35,7 @@ export class EmailTemplates {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Welcome to Spective Talent Flow</title>
+        <title>Welcome to Spective</title>
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -48,11 +48,11 @@ export class EmailTemplates {
       <body>
         <div class="container">
           <div class="header">
-            <h1>Welcome to Spective Talent Flow!</h1>
+            <h1>Welcome to Spective!</h1>
           </div>
           <div class="content">
             <h2>Hello {{ userName }}!</h2>
-            <p>Thank you for joining Spective Talent Flow. We're excited to have you on board!</p>
+            <p>Thank you for joining Spective. We're excited to have you on board!</p>
             <p>Your account has been successfully created with the email address: <strong>{{ userEmail }}</strong></p>
             
             ${variables.loginUrl ? `
@@ -64,7 +64,7 @@ export class EmailTemplates {
             <p>Best regards,<br>The Spective Kft.</p>
           </div>
           <div class="footer">
-            <p>© 2025 Spective Talent Flow. All rights reserved.</p>
+            <p>© 2025 Spective . All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -72,11 +72,11 @@ export class EmailTemplates {
     `;
 
     const textContent = `
-      Welcome to Spective Talent Flow!
+      Welcome to Spective !
       
       Hello {{ userName }}!
       
-      Thank you for joining Spective Talent Flow. We're excited to have you on board!
+      Thank you for joining Spective . We're excited to have you on board!
       
       Your account has been successfully created with the email address: {{ userEmail }}
       
@@ -87,12 +87,12 @@ export class EmailTemplates {
       Best regards,
       The Spective Kft.
       
-      © 2025 Spective Talent Flow. All rights reserved.
+      © 2025 Spective . All rights reserved.
     `;
 
     return {
       to: variables.userEmail,
-      subject: 'Welcome to Spective Talent Flow!',
+      subject: 'Welcome to Spective !',
       html: this.replaceVariables(htmlContent, variables),
       text: this.replaceVariables(textContent, variables),
     };
@@ -133,7 +133,7 @@ export class EmailTemplates {
           </div>
           <div class="content">
             <h2>Hello {{ userName }}!</h2>
-            <p>We received a request to reset your password for your Spective Talent Flow account.</p>
+            <p>We received a request to reset your password for your Spective  account.</p>
             
             <p>To reset your password, click the button below:</p>
             <a href="{{ resetUrl }}" class="button">Reset Password</a>
@@ -150,7 +150,7 @@ export class EmailTemplates {
             <p>Best regards,<br>The Spective Kft.</p>
           </div>
           <div class="footer">
-            <p>© 2025 Spective Talent Flow. All rights reserved.</p>
+            <p>© 2025 Spective . All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -162,7 +162,7 @@ export class EmailTemplates {
       
       Hello {{ userName }}!
       
-      We received a request to reset your password for your Spective Talent Flow account.
+      We received a request to reset your password for your Spective  account.
       
       To reset your password, visit this link: {{ resetUrl }}
       
@@ -173,14 +173,14 @@ export class EmailTemplates {
       Best regards,
       The Spective Kft.
       
-      © 2025 Spective Talent Flow. All rights reserved.
+      © 2025 Spective . All rights reserved.
     `;
 
     const templateVars = { ...variables, expiresIn };
 
     return {
       to: variables.userEmail,
-      subject: 'Password Reset Request - Spective Talent Flow',
+      subject: 'Password Reset Request - Spective ',
       html: this.replaceVariables(htmlContent, templateVars),
       text: this.replaceVariables(textContent, templateVars),
     };
@@ -220,7 +220,7 @@ export class EmailTemplates {
           </div>
           <div class="content">
             <h2>Hello {{ userName }}!</h2>
-            <p>Thank you for signing up for Spective Talent Flow. To complete your registration, please verify your email address.</p>
+            <p>Thank you for signing up for Spective . To complete your registration, please verify your email address.</p>
             
             <p>Click the button below to verify your email:</p>
             <a href="{{ verificationUrl }}" class="button">Verify Email Address</a>
@@ -235,7 +235,7 @@ export class EmailTemplates {
             <p>Best regards,<br>The Spective Kft.</p>
           </div>
           <div class="footer">
-            <p>© 2025 Spective Talent Flow. All rights reserved.</p>
+            <p>© 2025 Spective . All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -247,7 +247,7 @@ export class EmailTemplates {
       
       Hello {{ userName }}!
       
-      Thank you for signing up for Spective Talent Flow. To complete your registration, please verify your email address.
+      Thank you for signing up for Spective . To complete your registration, please verify your email address.
       
       Click this link to verify your email: {{ verificationUrl }}
       
@@ -258,14 +258,14 @@ export class EmailTemplates {
       Best regards,
       The Spective Kft.
       
-      © 2025 Spective Talent Flow. All rights reserved.
+      © 2025 Spective . All rights reserved.
     `;
 
     const templateVars = { ...variables, expiresIn };
 
     return {
       to: variables.userEmail,
-      subject: 'Verify Your Email Address - Spective Talent Flow',
+      subject: 'Verify Your Email Address - Spective ',
       html: this.replaceVariables(htmlContent, templateVars),
       text: this.replaceVariables(textContent, templateVars),
     };
@@ -320,11 +320,11 @@ export class EmailTemplates {
             <a href="{{ loginUrl }}" class="button">Access Company Dashboard</a>
             ` : ''}
             
-            <p>Welcome to Spective Talent Flow! We're excited to help you find the perfect talent for your company.</p>
+            <p>Welcome to Spective ! We're excited to help you find the perfect talent for your company.</p>
             <p>Best regards,<br>The Spective Kft.</p>
           </div>
           <div class="footer">
-            <p>© 2025 Spective Talent Flow. All rights reserved.</p>
+            <p>© 2025 Spective . All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -347,12 +347,12 @@ export class EmailTemplates {
       
       ${variables.loginUrl ? `Ready to start finding talent? Visit: {{ loginUrl }}` : ''}
       
-      Welcome to Spective Talent Flow! We're excited to help you find the perfect talent for your company.
+      Welcome to Spective ! We're excited to help you find the perfect talent for your company.
       
       Best regards,
       The Spective Kft.
       
-      © 2025 Spective Talent Flow. All rights reserved.
+      © 2025 Spective . All rights reserved.
     `;
 
     return {
@@ -401,7 +401,7 @@ export class EmailTemplates {
           </div>
           <div class="content">
             <h2>Hello {{ contactPerson }},</h2>
-            <p>Thank you for <strong>{{ companyName }}</strong>'s interest in joining Spective Talent Flow.</p>
+            <p>Thank you for <strong>{{ companyName }}</strong>'s interest in joining Spective .</p>
             <p>After reviewing your company profile application, we need to inform you that it does not meet our current requirements for approval.</p>
             
             ${variables.reason ? `
@@ -425,7 +425,7 @@ export class EmailTemplates {
             <p>Best regards,<br>The Spective Kft.</p>
           </div>
           <div class="footer">
-            <p>© 2025 Spective Talent Flow. All rights reserved.</p>
+            <p>© 2025 Spective . All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -437,7 +437,7 @@ export class EmailTemplates {
       
       Hello {{ contactPerson }},
       
-      Thank you for {{ companyName }}'s interest in joining Spective Talent Flow.
+      Thank you for {{ companyName }}'s interest in joining Spective .
       
       After reviewing your company profile application, we need to inform you that it does not meet our current requirements for approval.
       
@@ -455,7 +455,7 @@ export class EmailTemplates {
       Best regards,
       The Spective Kft.
       
-      © 2025 Spective Talent Flow. All rights reserved.
+      © 2025 Spective . All rights reserved.
     `;
 
     const templateVars = { ...variables, supportEmail };
@@ -515,11 +515,11 @@ export class EmailTemplates {
             <a href="{{ loginUrl }}" class="button">Access Your Dashboard</a>
             ` : ''}
             
-            <p>Welcome to the Spective Talent Flow community! We're excited to help you connect with great opportunities.</p>
+            <p>Welcome to the Spective  community! We're excited to help you connect with great opportunities.</p>
             <p>Best regards,<br>The Spective Kft.</p>
           </div>
           <div class="footer">
-            <p>© 2025 Spective Talent Flow. All rights reserved.</p>
+            <p>© 2025 Spective . All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -541,12 +541,12 @@ export class EmailTemplates {
       
       ${variables.loginUrl ? `Ready to get started? Visit: {{ loginUrl }}` : ''}
       
-      Welcome to the Spective Talent Flow community! We're excited to help you connect with great opportunities.
+      Welcome to the Spective  community! We're excited to help you connect with great opportunities.
       
       Best regards,
       The Spective Kft.
       
-      © 2025 Spective Talent Flow. All rights reserved.
+      © 2025 Spective . All rights reserved.
     `;
 
     return {
@@ -594,7 +594,7 @@ export class EmailTemplates {
           </div>
           <div class="content">
             <h2>Hello {{ userName }},</h2>
-            <p>Thank you for your interest in joining Spective Talent Flow as a professional.</p>
+            <p>Thank you for your interest in joining Spective  as a professional.</p>
             <p>After reviewing your profile application, we need to inform you that it does not meet our current requirements for approval.</p>
             
             ${variables.reason ? `
@@ -618,7 +618,7 @@ export class EmailTemplates {
             <p>Best regards,<br>The Spective Kft.</p>
           </div>
           <div class="footer">
-            <p>© 2025 Spective Talent Flow. All rights reserved.</p>
+            <p>© 2025 Spective . All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -630,7 +630,7 @@ export class EmailTemplates {
       
       Hello {{ userName }},
       
-      Thank you for your interest in joining Spective Talent Flow as a professional.
+      Thank you for your interest in joining Spective  as a professional.
       
       After reviewing your profile application, we need to inform you that it does not meet our current requirements for approval.
       
@@ -648,7 +648,7 @@ export class EmailTemplates {
       Best regards,
       The Spective Kft.
       
-      © 2025 Spective Talent Flow. All rights reserved.
+      © 2025 Spective . All rights reserved.
     `;
 
     const templateVars = { ...variables, supportEmail };
@@ -704,7 +704,7 @@ export class EmailTemplates {
             <p>Best regards,<br>The Spective Kft.</p>
           </div>
           <div class="footer">
-            <p>© 2025 Spective Talent Flow. All rights reserved.</p>
+            <p>© 2025 Spective . All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -723,7 +723,7 @@ export class EmailTemplates {
       Best regards,
       The Spective Kft.
       
-      © 2025 Spective Talent Flow. All rights reserved.
+      © 2025 Spective . All rights reserved.
     `;
 
     return {
@@ -798,7 +798,7 @@ export class EmailTemplates {
             </p>
           </div>
           <div class="footer">
-            <p>© 2025 Spective Talent Flow. All rights reserved.</p>
+            <p>© 2025 Spective . All rights reserved.</p>
           </div>
         </div>
       </body>
