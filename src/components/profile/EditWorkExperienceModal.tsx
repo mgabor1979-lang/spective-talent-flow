@@ -168,15 +168,15 @@ export const EditWorkExperienceModal = ({
     setLoading(true);
     
     try {
-      // Get current authenticated user to ensure we're only updating their data
+      // Get current authenticated user for security check
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
         throw new Error('No authenticated user found');
       }
 
-      // Ensure we're only updating the current user's profile
-      const targetUserId = user.id;
+      // Use the userId prop for the target profile (allows admin to edit other profiles)
+      const targetUserId = userId;
       
       // Convert experiences back to the database format
       const experienceTexts = experiences
