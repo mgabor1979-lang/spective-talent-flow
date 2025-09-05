@@ -168,6 +168,16 @@ export const EditWorkExperienceModal = ({
     setLoading(true);
     
     try {
+      // Get current authenticated user to ensure we're only updating their data
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('No authenticated user found');
+      }
+
+      // Ensure we're only updating the current user's profile
+      const targetUserId = user.id;
+      
       // Convert experiences back to the database format
       const experienceTexts = experiences
         .filter(exp => {
@@ -191,7 +201,7 @@ export const EditWorkExperienceModal = ({
       const { error } = await supabase
         .from('professional_profiles')
         .update({ work_experience: workExperienceText })
-        .eq('user_id', userId);
+        .eq('user_id', targetUserId);
 
       if (error) throw error;
 

@@ -36,10 +36,20 @@ export const EditTechnologiesModal = ({ isOpen, onClose, technologies, userId, o
   const handleSave = async () => {
     setLoading(true);
     try {
+      // Get current authenticated user to ensure we're only updating their data
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('No authenticated user found');
+      }
+
+      // Ensure we're only updating the current user's profile
+      const targetUserId = user.id;
+      
       const { error } = await supabase
         .from('professional_profiles')
         .update({ technologies: technologiesList })
-        .eq('user_id', userId);
+        .eq('user_id', targetUserId);
 
       if (error) throw error;
 
