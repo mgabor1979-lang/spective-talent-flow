@@ -106,7 +106,7 @@ app.get("/api/health", (req, res) => {
       
       res.json({
         configured: !!apiKey,
-        fromEmailConfigured: !!fromEmail && fromEmail !== 'noreply@yourdomain.com',
+        fromEmailConfigured: !!fromEmail && fromEmail !== 'noreply@spective.hu',
         status: 'operational'
       });
     } catch (statusError) {
