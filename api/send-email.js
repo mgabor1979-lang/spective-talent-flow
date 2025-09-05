@@ -37,7 +37,8 @@ function isAllowedOrigin(request) {
     'http://localhost:3000',
     'http://localhost:5173',
     'https://spective-talent-flow-git-ssr-resend-cryptonit.vercel.app',
-    'https://spective.cryptonit.hu'
+    'https://spective.cryptonit.hu',
+    'https://spective.hu'
   ];
   
   if (!origin) return false; // No origin header
@@ -53,7 +54,8 @@ export default async function handler(request, response) {
     'http://localhost:3000', 
     'http://localhost:5173',
     'https://spective-talent-flow-git-ssr-resend-cryptonit.vercel.app',
-    'https://spective.cryptonit.hu'
+    'https://spective.cryptonit.hu',
+    'https://spective.hu'
   ];
   
   if (allowedOrigins.includes(origin)) {

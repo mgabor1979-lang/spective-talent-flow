@@ -19,6 +19,8 @@ app.use(
           "https://localhost:8080",
           "http://spective.cryptonit.hu",
           "https://spective.cryptonit.hu",
+          "https://spective.hu",
+          "http://spective.hu",
           "http://localhost:8081",
           "https://localhost:8081",
           "http://192.168.1.184:8081/",

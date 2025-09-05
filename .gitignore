@@ -24,6 +24,6 @@ dist-ssr
 *.sw?
 LINE_BREAK_FIX.md
 node_modules/
-supabase/
+/supabase/
 .env
 database_recreation.sql
