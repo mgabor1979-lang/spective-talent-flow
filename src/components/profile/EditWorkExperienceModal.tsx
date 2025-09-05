@@ -192,7 +192,9 @@ export const EditWorkExperienceModal = ({
           const startDate = `${exp.startMonth} ${exp.startYear}`;
           const endDate = exp.isCurrent ? 'Present' : `${exp.endMonth} ${exp.endYear}`;
           const duration = `${startDate} - ${endDate}`;
-          return `${exp.position} at ${exp.company} (${duration}): ${exp.description}`;
+          // Ensure description is never empty - use a space if empty
+          const description = exp.description.trim() || ' ';
+          return `${exp.position} at ${exp.company} (${duration}): ${description}`;
         });
       
       // Combine summary with experiences using unique separator
