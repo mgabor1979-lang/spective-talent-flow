@@ -158,7 +158,7 @@ export const Homepage = () => {
               {portfolioItems.map((item) => (
                 <div key={item.id} className="p-4 border-l-4 border-spective-accent bg-muted rounded-r-lg">
                   <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                  <p className="text-muted-foreground">{item.description}</p>
+                  {item.description && <p className="text-muted-foreground">{item.description}</p>}
                 </div>
               ))}
             </div>

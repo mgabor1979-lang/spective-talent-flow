@@ -482,7 +482,7 @@ export const PortfolioManagement = () => {
                   </Button>
                   <Button
                     onClick={editingItem ? handleUpdateItem : handleCreateItem}
-                    disabled={!formData.title || !formData.description}
+                    disabled={!formData.title}
                   >
                     {editingItem ? 'Update' : 'Create'}
                   </Button>
