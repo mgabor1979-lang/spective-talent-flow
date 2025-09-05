@@ -23,21 +23,11 @@ export const EditExperienceSummaryModal = ({ isOpen, onClose, currentSummary, us
   const handleSave = async () => {
     setLoading(true);
     try {
-      // Get current authenticated user to ensure we're only updating their data
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error('No authenticated user found');
-      }
-
-      // Ensure we're only updating the current user's profile
-      const targetUserId = user.id;
-      
       // Get the current work experience to preserve it
       const { data: currentProfile } = await supabase
         .from('professional_profiles')
         .select('work_experience')
-        .eq('user_id', targetUserId)
+        .eq('user_id', userId)
         .single();
 
       // Parse current work experience to extract detailed experiences
@@ -51,7 +41,7 @@ export const EditExperienceSummaryModal = ({ isOpen, onClose, currentSummary, us
       const { error } = await supabase
         .from('professional_profiles')
         .update({ work_experience: updatedWorkExperience })
-        .eq('user_id', targetUserId);
+        .eq('user_id', userId);
 
       if (error) throw error;
 

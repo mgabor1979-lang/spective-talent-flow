@@ -68,16 +68,6 @@ export const EditAvailabilityModal = ({
 
     setLoading(true);
     try {
-      // Get current authenticated user to ensure we're only updating their data
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error('No authenticated user found');
-      }
-
-      // Ensure we're only updating the current user's profile
-      const targetUserId = user.id;
-      
       // Handle email scheduling first
       await handleScheduling(available, availableFrom);
 
@@ -98,7 +88,7 @@ export const EditAvailabilityModal = ({
           availablefrom: availableFromValue,
           updated_at: new Date().toISOString()
         })
-        .eq('user_id', targetUserId);
+        .eq('user_id', userId);
 
       if (error) throw error;
 
@@ -108,12 +98,12 @@ export const EditAvailabilityModal = ({
         const { data: userData } = (await supabase
           .from('profiles')
           .select('email, full_name')
-          .eq('user_id', targetUserId)
+          .eq('user_id', userId)
           .single());
 
         const userEmail = userData?.email;
         const userName = userData?.full_name;
-        const profileUrl = `${window.location.origin}/profile/${targetUserId}`;
+        const profileUrl = `${window.location.origin}/profile/${userId}`;
 
         const now = new Date();
         const thirtyDaysFromNow = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000));
@@ -134,21 +124,21 @@ export const EditAvailabilityModal = ({
         const { data: alreadyScheduledEmails } = await supabase
           .from('scheduled_availability_emails')
           .select('*')
-          .eq('user_id', targetUserId)
-          .eq('professional_id', targetUserId);
+          .eq('user_id', userId)
+          .eq('professional_id', userId);
 
         if (alreadyScheduledEmails.length > 0) {
           cancelScheduledEmail(alreadyScheduledEmails[0].resend_email_id);
 
           await supabase.from('scheduled_availability_emails')
             .delete()
-            .eq('user_id', targetUserId)
-            .eq('professional_id', targetUserId);
+            .eq('user_id', userId)
+            .eq('professional_id', userId);
         }
 
         await supabase.from('scheduled_availability_emails').insert({
-          user_id: targetUserId,
-          professional_id: targetUserId,
+          user_id: userId,
+          professional_id: userId,
           available_date: availableFrom.toISOString(),
           email_data: {
             email: userEmail,

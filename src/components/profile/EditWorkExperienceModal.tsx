@@ -168,16 +168,6 @@ export const EditWorkExperienceModal = ({
     setLoading(true);
     
     try {
-      // Get current authenticated user for security check
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error('No authenticated user found');
-      }
-
-      // Use the userId prop for the target profile (allows admin to edit other profiles)
-      const targetUserId = userId;
-      
       // Convert experiences back to the database format
       const experienceTexts = experiences
         .filter(exp => {
@@ -203,7 +193,7 @@ export const EditWorkExperienceModal = ({
       const { error } = await supabase
         .from('professional_profiles')
         .update({ work_experience: workExperienceText })
-        .eq('user_id', targetUserId);
+        .eq('user_id', userId);
 
       if (error) throw error;
 

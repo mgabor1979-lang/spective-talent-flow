@@ -37,18 +37,6 @@ export const EditPersonalInfoModal = ({ isOpen, onClose, profileData, onUpdate }
     console.log('Saving profile data:', { fullName, phone, birthDate, dailyWage, city });
     
     try {
-      // Get current authenticated user to ensure we're only updating their data
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error('No authenticated user found');
-      }
-
-      // Ensure we're only updating the current user's profile
-      const targetUserId = user.id;
-      
-      console.log('Updating profile for user:', targetUserId);
-      
       // Update profiles table
       const { error: profileError } = await supabase
         .from('profiles')
@@ -57,7 +45,7 @@ export const EditPersonalInfoModal = ({ isOpen, onClose, profileData, onUpdate }
           phone: phone || null,
           birth_date: birthDate || null,
         })
-        .eq('user_id', targetUserId);
+        .eq('user_id', profileData.user_id);
 
       if (profileError) throw profileError;
 
@@ -71,7 +59,7 @@ export const EditPersonalInfoModal = ({ isOpen, onClose, profileData, onUpdate }
             daily_wage_net: parseFloat(dailyWage) || null,
             city: city || null,
           })
-          .eq('user_id', targetUserId);
+          .eq('user_id', profileData.user_id);
 
         if (professionalError) {
           console.error('Professional profile update error:', professionalError);

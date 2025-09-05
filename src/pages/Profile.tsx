@@ -344,15 +344,8 @@ export const Profile = () => {
           }
         }
 
-        // Ensure we have a valid session before proceeding
-        if (!session?.user?.id) {
-          console.error('No valid session found');
-          setLoading(false);
-          return;
-        }
-
         // If no userId in params, show current user's profile
-        const targetUserId = userId || session.user.id;
+        const targetUserId = userId || session?.user?.id;
         
         if (!targetUserId) {
           setLoading(false);
@@ -960,16 +953,14 @@ export const Profile = () => {
          </div>
        </section>
 
-      {/* Edit Modals - Only show for own profile or admin users */}
-      {profileData && (currentUser?.id === profileData.user_id || isAdmin) && (
+      {/* Edit Modals */}
+      {profileData && (
         <>
           <EditPersonalInfoModal
             isOpen={editPersonalInfoOpen}
             onClose={() => setEditPersonalInfoOpen(false)}
             profileData={{
               ...profileData,
-              // Ensure we're using the current user's ID for the edit operation
-              user_id: currentUser?.id || profileData.user_id,
               professional_profile: {
                 daily_wage_net: typeof profileData.professional_profile?.daily_wage_net === 'string' ? 0 : profileData.professional_profile?.daily_wage_net,
                 city: profileData.professional_profile?.city
@@ -980,7 +971,7 @@ export const Profile = () => {
           <EditAvailabilityModal
             isOpen={editAvailabilityOpen}
             onClose={() => setEditAvailabilityOpen(false)}
-            userId={currentUser?.id || profileData.user_id}
+            userId={profileData.user_id}
             currentAvailable={profileData.professional_profile?.available}
             currentAvailableFrom={profileData.professional_profile?.availablefrom}
             onUpdate={handleProfileUpdate}
@@ -989,28 +980,28 @@ export const Profile = () => {
             isOpen={editSkillsOpen}
             onClose={() => setEditSkillsOpen(false)}
             skills={skills}
-            userId={currentUser?.id || profileData.user_id}
+            userId={profileData.user_id}
             onUpdate={handleProfileUpdate}
           />
           <EditLanguagesModal
             isOpen={editLanguagesOpen}
             onClose={() => setEditLanguagesOpen(false)}
             languages={languages}
-            userId={currentUser?.id || profileData.user_id}
+            userId={profileData.user_id}
             onUpdate={handleProfileUpdate}
           />
           <EditTechnologiesModal
             isOpen={editTechnologiesOpen}
             onClose={() => setEditTechnologiesOpen(false)}
             technologies={technologies}
-            userId={currentUser?.id || profileData.user_id}
+            userId={profileData.user_id}
             onUpdate={handleProfileUpdate}
           />
           <EditExperienceSummaryModal
             isOpen={editExperienceSummaryOpen}
             onClose={() => setEditExperienceSummaryOpen(false)}
             currentSummary={experienceSummary}
-            userId={currentUser?.id || profileData.user_id}
+            userId={profileData.user_id}
             onUpdate={handleProfileUpdate}
           />
           <EditWorkExperienceModal
@@ -1018,7 +1009,7 @@ export const Profile = () => {
             onClose={() => setEditWorkExperienceOpen(false)}
             workExperiences={workExperiences}
             currentSummary={experienceSummary}
-            userId={currentUser?.id || profileData.user_id}
+            userId={profileData.user_id}
             onUpdate={handleProfileUpdate}
           />
           <EditEducationModal
@@ -1036,7 +1027,7 @@ export const Profile = () => {
                 isCurrent: endYear === 'Present'
               };
             })}
-            userId={currentUser?.id || profileData.user_id}
+            userId={profileData.user_id}
             onUpdate={handleProfileUpdate}
           />
         </>
