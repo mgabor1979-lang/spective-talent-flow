@@ -78,7 +78,7 @@ export const TermsConditionsUpload = ({
       }, 100);
 
       // Upload to Vercel Blob
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload-terms?filename=${encodeURIComponent(file.name)}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/upload-terms?filename=${encodeURIComponent(file.name)}`, {
         method: 'POST',
         headers: {
           'Content-Type': file.type,
@@ -121,7 +121,7 @@ export const TermsConditionsUpload = ({
     if (!currentUrl) return;
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/delete-terms`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/delete-terms`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
