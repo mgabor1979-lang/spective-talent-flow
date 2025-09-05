@@ -104,9 +104,6 @@ function SortablePortfolioItem({
         </div>
         
         <div className="flex items-center space-x-3 flex-1 min-w-0">
-          <div className="text-primary flex-shrink-0">
-            <Briefcase className="h-8 w-8" />
-          </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-2 mb-1">
               <h3 className="font-semibold line-clamp-1">{item.title}</h3>
