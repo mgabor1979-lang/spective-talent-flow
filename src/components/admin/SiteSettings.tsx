@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { HomepageServicesManagement } from './HomepageServicesManagement';
+import { PortfolioManagement } from './PortfolioManagement';
 import { TermsConditionsUpload } from './TermsConditionsUpload';
 import { 
   Building2, 
@@ -236,13 +237,14 @@ export const SiteSettings = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="company" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="company">Company Info</TabsTrigger>
               <TabsTrigger value="email">Email Settings</TabsTrigger>
               <TabsTrigger value="templates">Email Templates</TabsTrigger>
               <TabsTrigger value="homepage">Homepage</TabsTrigger>
               <TabsTrigger value="terms">Terms & Conditions</TabsTrigger>
               <TabsTrigger value="services">Services</TabsTrigger>
+              <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
             </TabsList>
 
             <TabsContent value="company" className="space-y-6">
@@ -490,6 +492,10 @@ export const SiteSettings = () => {
 
             <TabsContent value="services">
               <HomepageServicesManagement />
+            </TabsContent>
+
+            <TabsContent value="portfolio">
+              <PortfolioManagement />
             </TabsContent>
           </Tabs>
         </CardContent>

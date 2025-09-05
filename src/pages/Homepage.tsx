@@ -4,9 +4,11 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Target, Award, Users, Briefcase, Globe, Lightbulb, TrendingUp } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { useHomepageServices } from '@/hooks/use-homepage-services';
+import { usePortfolioItems } from '@/hooks/use-portfolio-items';
 
 export const Homepage = () => {
   const { services, loading: servicesLoading } = useHomepageServices();
+  const { items: portfolioItems, loading: portfolioLoading } = usePortfolioItems();
 
   // Available icons mapping
   const iconMap = {
@@ -24,15 +26,6 @@ export const Homepage = () => {
     const IconComponent = iconMap[iconName as keyof typeof iconMap] || Target;
     return <IconComponent className="h-8 w-8" />;
   };
-
-  const portfolioItems = [
-    "New Product Implementation (NPI) projects for multiple Tier 1 automotive suppliers",
-    "Comprehensive APQP project support across various production and development phases",
-    "Successful management of customer and supplier escalation projects, ensuring rapid resolution and sustainable corrective actions",
-    "Development and implementation of IATF 16949-compliant quality management systems",
-    "Complete production relocation projects, including the transfer of manufacturing operations from Germany to Hungary",
-    "Full-scope greenfield plant construction projects, covering design partner selection, design approval, permitting, and execution management"
-  ];
 
   const partners = [
     { name: "Magna", logo: "https://spective.azurewebsites.net/Content/images/logo1.png" },
@@ -151,13 +144,25 @@ export const Homepage = () => {
       <section className="py-20 bg-background">
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-bold mb-12">Our Project Portfolio</h2>
-          <div className="space-y-4">
-            {portfolioItems.map((item) => (
-              <div key={item} className="p-4 border-l-4 border-spective-accent bg-muted rounded-r-lg">
-                <p className="text-lg">{item}</p>
-              </div>
-            ))}
-          </div>
+          {portfolioLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((item) => (
+                <div key={`loading-${item}`} className="p-4 border-l-4 border-spective-accent bg-muted rounded-r-lg animate-pulse">
+                  <div className="h-6 bg-muted-foreground/20 rounded mb-2"></div>
+                  <div className="h-4 bg-muted-foreground/20 rounded w-3/4"></div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {portfolioItems.map((item) => (
+                <div key={item.id} className="p-4 border-l-4 border-spective-accent bg-muted rounded-r-lg">
+                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                  <p className="text-muted-foreground">{item.description}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
