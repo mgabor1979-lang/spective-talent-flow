@@ -28,11 +28,11 @@ export const Homepage = () => {
   };
 
   const partners = [
-    { name: "Magna", logo: "https://spective.azurewebsites.net/Content/images/logo1.png" },
-    { name: "Woco", logo: "https://spective.azurewebsites.net/Content/images/logo2.png" },
-    { name: "Yanfeng", logo: "https://spective.azurewebsites.net/Content/images/logo3.jpg" },
-    { name: "FEINTOOL", logo: "https://spective.azurewebsites.net/Content/images/logo4.png" },
-    { name: "Autoneum", logo: "https://spective.azurewebsites.net/Content/images/logo5.png" }
+    { name: "Magna", logo: "/images/logo1.png" },
+    { name: "Woco", logo: "/images/logo2.png" },
+    { name: "Yanfeng", logo: "/images/logo3.jpg" },
+    { name: "FEINTOOL", logo: "/images/logo4.png" },
+    { name: "Autoneum", logo: "/images/logo5.png" }
   ];
 
   return (
@@ -76,7 +76,7 @@ export const Homepage = () => {
             </div>
             <div className="flex justify-center">
               <img 
-                src="https://spective.azurewebsites.net/Content/images/team.jpeg" 
+                src="/images/team.jpeg" 
                 alt="Professional team" 
                 className="rounded-lg w-full max-w-md"
               />
@@ -126,7 +126,7 @@ export const Homepage = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <img 
-                src="https://spective.azurewebsites.net/Content/images/us.jpeg" 
+                src="/images/us.jpeg" 
                 alt="About Spective" 
                 className="rounded-lg w-full"
               />
@@ -221,7 +221,7 @@ export const Homepage = () => {
             </div>
             <div className="flex justify-center">
               <img 
-                src="https://spective.azurewebsites.net/Content/images/success.jpeg" 
+                src="/images/success.jpeg" 
                 alt="Our vision" 
                 className="rounded-lg w-full max-w-md"
               />
@@ -260,7 +260,7 @@ export const Homepage = () => {
             </div>
             <div className="flex justify-center">
               <img 
-                src="https://spective.azurewebsites.net/Content/images/partnership.jpeg" 
+                src="/images/partnership.jpeg" 
                 alt="Partnership" 
                 className="rounded-lg w-full max-w-md"
               />

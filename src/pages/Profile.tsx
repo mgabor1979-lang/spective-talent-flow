@@ -630,7 +630,7 @@ export const Profile = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
               <Avatar className="h-24 w-24">
-                <AvatarImage src="https://spective.azurewebsites.net/Content/images/maleavatar.png" />
+                <AvatarImage src="/images/maleavatar.png" />
                 <AvatarFallback className="text-2xl font-bold">
                   {displayNameForAvatar}
                 </AvatarFallback>
