@@ -273,11 +273,11 @@ const ExperienceStep = ({ onNext, onPrevious, defaultValues }: {
             <FormItem>
               <FormLabel>Professional Experience Summary</FormLabel>
               <FormDescription>
-                Provide an overview of your professional background, key achievements, and career highlights
+                Provide an overview of your professional background and career highlights
               </FormDescription>
               <FormControl>
                 <Textarea
-                  placeholder="Summarize your professional experience, highlighting your key strengths, achievements, and areas of expertise..."
+                  placeholder="Summarize your professional experience, highlighting your key strengths and areas of expertise..."
                   className="min-h-[100px]"
                   {...field}
                 />
@@ -510,7 +510,7 @@ const ExperienceStep = ({ onNext, onPrevious, defaultValues }: {
                     </FormDescription>
                     <FormControl>
                       <Textarea
-                        placeholder="Describe your role and key achievements..."
+                        placeholder="Describe your role and key achievements... (numbers, data, facts)"
                         className="min-h-[100px]"
                         {...field}
                       />
