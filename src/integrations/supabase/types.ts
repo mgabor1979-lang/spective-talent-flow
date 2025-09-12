@@ -537,6 +537,12 @@ export type Database = {
         }
         Returns: number
       }
+      get_admin_emails: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          email: string
+        }[]
+      }
       get_or_cache_city_coordinates: {
         Args: {
           city_name_param: string

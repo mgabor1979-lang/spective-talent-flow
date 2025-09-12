@@ -15,6 +15,7 @@ interface UseEmailReturn {
   sendBulkEmails: (emails: EmailOptions[]) => Promise<{ success: boolean; results: any[]; errors: any[] }>;
   scheduleAvailabilityReminder: (userName: string, userEmail: string, availableFrom: string, profileUrl: string) => Promise<{ success: boolean; messageId?: string; error?: string }>;
   cancelScheduledEmail: (emailId: string) => Promise<{ success: boolean; error?: string }>;
+  sendAdminNotificationAboutNewProfileToReviewEmail: (adminEmail: string, professionalName: string, profileUrl?: string, profileType?: 'professional' | 'company') => Promise<{ success: boolean; messageId?: string; error?: string }>;
   getUsageStats: () => { daily: number; monthly: number; dailyLimit: number; monthlyLimit: number };
   isLoading: boolean;
   error: string | null;
@@ -129,6 +130,16 @@ export const useEmail = (): UseEmailReturn => {
     return sendEmail(emailOptions);
   }, [sendEmail]);
 
+  const sendAdminNotificationAboutNewProfileToReviewEmail = useCallback(async (
+    adminEmail: string,
+    professionalName: string,
+    profileUrl?: string,
+    profileType: 'professional' | 'company' = 'professional'
+  ) => {
+    const emailOptions = EmailTemplates.newProfileToReviewEmail({ adminEmail, name: professionalName, profileUrl, profileType });
+    return sendEmail(emailOptions);
+  }, [sendEmail]);
+
   const sendCompanyApprovalEmail = useCallback(async (
     companyName: string,
     contactPerson: string,
@@ -191,6 +202,7 @@ export const useEmail = (): UseEmailReturn => {
     sendNotificationEmail,
     sendProfessionalApprovalEmail,
     sendProfessionalRejectionEmail,
+    sendAdminNotificationAboutNewProfileToReviewEmail,
     sendCompanyApprovalEmail,
     sendCompanyRejectionEmail,
     sendBulkEmails,

@@ -833,4 +833,59 @@ export class EmailTemplates {
       text: this.replaceVariables(textContent, variables),
     };
   }
+
+  static newProfileToReviewEmail(variables: {
+    adminEmail: string;
+    name: string;
+    profileType: 'professional' | 'company';
+    profileUrl?: string;
+  }) {
+    const htmlContent = `
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>New Profile Submitted for Review - ${variables.name}</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .header h1 { color: white; margin: 0; font-size: 24px; }
+          .content { background-color: #ffffff; padding: 30px; border: 1px solid #e9ecef; }
+          .footer { background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 8px 8px; font-size: 14px; color: #6c757d; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>New Profile Submitted for Review - ${variables.name}</h1>
+          </div>
+          <div class="content">
+            <h2>Hello Admin!</h2>
+            <p>A new ${variables.profileType} <a href="${variables.profileUrl}" target="_blank">profile</a> has been submitted for review.</p>
+          </div>
+          <div class="footer">
+            <p>© 2025 Spective Kft. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const textContent = `
+      New Profile Submitted for Review - ${variables.name}
+
+      Hello Admin!
+
+      A new ${variables.profileType} profile has been submitted for review.
+      Review: ${variables.profileUrl || 'N/A'}
+    `;
+
+    return {
+      to: variables.adminEmail,
+      subject: 'New Profile Submitted for Review - ' + variables.name,
+      html: this.replaceVariables(htmlContent, variables),
+      text: this.replaceVariables(textContent, variables),
+    };
+  }
 }
