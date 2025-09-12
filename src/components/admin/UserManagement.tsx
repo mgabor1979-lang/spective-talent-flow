@@ -286,7 +286,7 @@ export const UserManagement = () => {
         throw new Error('No active session');
       }
 
-      const result = await fetch(`${import.meta.env.VITE_API_URL}/api/delete-user`, {
+      const result = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/delete-user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
