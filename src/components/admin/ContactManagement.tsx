@@ -7,12 +7,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Search, 
-  Eye, 
-  Building2, 
-  Mail, 
-  Phone, 
+import {
+  Search,
+  Eye,
+  Building2,
+  Mail,
+  Phone,
   Calendar,
   ExternalLink
 } from 'lucide-react';
@@ -40,6 +40,9 @@ interface ContactRequest {
   email: string;
   phone?: string;
   message: string;
+  duration?: string;
+  location?: string;
+  subject?: string;
   professional_id?: string;
   professional?: PartialProfessional | null;
   status: ContactStatus;
@@ -89,7 +92,7 @@ export const ContactManagement = () => {
         const formattedContacts: ContactRequest[] = contacts?.map(contact => {
           const professionalData = professionals?.find(p => p.user_id === contact.professional_id);
           let professional: PartialProfessional | null = null;
-          
+
           if (professionalData) {
             professional = new PartialProfessional(professionalData.user_id, professionalData.full_name);
           } else if (contact.professional_id) {
@@ -103,6 +106,9 @@ export const ContactManagement = () => {
             email: contact.email,
             phone: contact.phone,
             message: contact.message,
+            duration: contact.duration,
+            subject: contact.subject,
+            location: contact.location,
             professional_id: contact.professional_id,
             professional: professional,
             status: contact.status as ContactStatus,
@@ -130,7 +136,7 @@ export const ContactManagement = () => {
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(contact => 
+      filtered = filtered.filter(contact =>
         contact.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contact.contact_person.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contact.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -150,7 +156,7 @@ export const ContactManagement = () => {
       // Try to update the contact status in the database
       const { error } = await supabase
         .from('contact_requests')
-        .update({ 
+        .update({
           status: newStatus,
           updated_at: new Date().toISOString()
         })
@@ -159,8 +165,8 @@ export const ContactManagement = () => {
       if (error && error.code !== '42P01') throw error;
 
       // Update local state
-      setContacts(prev => prev.map(contact => 
-        contact.id === contactId 
+      setContacts(prev => prev.map(contact =>
+        contact.id === contactId
           ? { ...contact, status: newStatus, updated_at: new Date().toISOString() }
           : contact
       ));
@@ -378,10 +384,32 @@ export const ContactManagement = () => {
                 </div>
               </div>
 
+
+              <div>
+                <h4 className="font-semibold">Subject</h4>
+                <div className="mt-2 p-3 bg-muted rounded-md">
+                  <p className="text-sm">{selectedContact.subject}</p>
+                </div>
+              </div>
+
               <div>
                 <h4 className="font-semibold">Message</h4>
                 <div className="mt-2 p-3 bg-muted rounded-md">
                   <p className="text-sm">{selectedContact.message}</p>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold">Duration</h4>
+                <div className="mt-2 p-3 bg-muted rounded-md">
+                  <p className="text-sm">{selectedContact.duration}</p>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold">Location</h4>
+                <div className="mt-2 p-3 bg-muted rounded-md">
+                  <p className="text-sm">{selectedContact.location}</p>
                 </div>
               </div>
 
