@@ -8,6 +8,8 @@ interface CVDocumentProps {
     hideEmail: boolean;
     hideMobile: boolean;
     hideWage: boolean;
+    wageOverride: boolean;
+    customDailyWage: string;
     logo: string | null;
   };
 }
@@ -32,6 +34,12 @@ export const CVDocument = ({ profileData, parsedData, options }: CVDocumentProps
 
   const formatWage = (wage: number | string): string => {
     if (options.hideWage) return '****';
+    
+    // If wage override is enabled, use custom daily wage
+    if (options.wageOverride && options.customDailyWage) {
+      return options.customDailyWage;
+    }
+    
     if (typeof wage === 'number') {
       return `${wage.toLocaleString()} HUF/day`;
     }
@@ -243,15 +251,6 @@ export const CVDocument = ({ profileData, parsedData, options }: CVDocumentProps
           </div>
         </div>
       )}
-
-      
-
-      
-
-      {/* Footer */}
-      <div className="mt-12 pt-6 border-t border-gray-200 text-center text-xs text-gray-500">
-        <p>CV generated on {new Date().toLocaleDateString()}</p>
-      </div>
     </div>
   );
 };

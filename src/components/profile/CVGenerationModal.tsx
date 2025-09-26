@@ -22,6 +22,8 @@ interface CVOptions {
   hideEmail: boolean;
   hideMobile: boolean;
   hideWage: boolean;
+  wageOverride: boolean;
+  customDailyWage: string;
   logo: string | null;
 }
 
@@ -31,6 +33,8 @@ export const CVGenerationModal = ({ isOpen, onClose, profileData, parsedData }: 
     hideEmail: false,
     hideMobile: false,
     hideWage: false,
+    wageOverride: false,
+    customDailyWage: '',
     logo: null
   });
   const [isGenerating, setIsGenerating] = useState(false);
@@ -52,10 +56,17 @@ export const CVGenerationModal = ({ isOpen, onClose, profileData, parsedData }: 
     }
   };
 
-  const handleCheckboxChange = (field: keyof Omit<CVOptions, 'logo'>, checked: boolean) => {
+  const handleCheckboxChange = (field: keyof Omit<CVOptions, 'logo' | 'customDailyWage'>, checked: boolean) => {
     setCvOptions(prev => ({
       ...prev,
       [field]: checked
+    }));
+  };
+
+  const handleCustomWageChange = (value: string) => {
+    setCvOptions(prev => ({
+      ...prev,
+      customDailyWage: value
     }));
   };
 
@@ -184,7 +195,30 @@ export const CVGenerationModal = ({ isOpen, onClose, profileData, parsedData }: 
                       />
                       <Label htmlFor="hideWage">Hide Wage</Label>
                     </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="wageOverride"
+                        checked={cvOptions.wageOverride}
+                        onCheckedChange={(checked) => handleCheckboxChange('wageOverride', checked as boolean)}
+                      />
+                      <Label htmlFor="wageOverride">Wage Override</Label>
+                    </div>
                   </div>
+                  {cvOptions.wageOverride && (
+                    <div className="mt-4">
+                      <Label htmlFor="customDailyWage" className="text-sm font-medium">
+                        Custom Daily Wage
+                      </Label>
+                      <Input
+                        id="customDailyWage"
+                        type="text"
+                        placeholder="100.000 HUF/day"
+                        value={cvOptions.customDailyWage}
+                        onChange={(e) => handleCustomWageChange(e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

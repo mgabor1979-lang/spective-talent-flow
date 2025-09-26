@@ -327,6 +327,8 @@ interface CVPDFDocumentProps {
         hideEmail: boolean;
         hideMobile: boolean;
         hideWage: boolean;
+        wageOverride: boolean;
+        customDailyWage: string;
         logo: string | null;
     };
 }
@@ -351,6 +353,12 @@ export const CVPDFDocument = ({ profileData, parsedData, options }: CVPDFDocumen
 
     const formatWage = (wage: number | string): string => {
         if (options.hideWage) return '****';
+        
+        // If wage override is enabled, use custom daily wage
+        if (options.wageOverride && options.customDailyWage) {
+            return options.customDailyWage;
+        }
+        
         if (typeof wage === 'number') {
             return `${wage.toLocaleString()} HUF/day`;
         }
@@ -412,6 +420,7 @@ export const CVPDFDocument = ({ profileData, parsedData, options }: CVPDFDocumen
                                         <Text>{profileData.age} years old</Text>
                                     </View>
                                 )}
+
                                 {profileData.professional_profile?.daily_wage_net && (
                                     <View>
                                         <Text style={styles.contactLabel}>Daily Rate:</Text>
@@ -561,11 +570,6 @@ export const CVPDFDocument = ({ profileData, parsedData, options }: CVPDFDocumen
                         </View>
                     </View>
                 )}
-
-                {/* Footer */}
-                <Text style={styles.footer}>
-                    CV generated on {new Date().toLocaleDateString()}
-                </Text>
             </Page>
         </Document>
     );
