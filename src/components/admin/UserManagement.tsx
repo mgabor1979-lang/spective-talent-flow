@@ -23,6 +23,28 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+// Cookie utility functions
+const setCookie = (name: string, value: string, days: number = 7) => {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+};
+
+const getCookie = (name: string): string | null => {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for (const cookie of ca) {
+    let c = cookie;
+    while (c.startsWith(' ')) c = c.substring(1);
+    if (c.startsWith(nameEQ)) return c.substring(nameEQ.length);
+  }
+  return null;
+};
+
+const deleteCookie = (name: string) => {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+};
+
 interface User {
   id: string;
   user_id: string;
@@ -41,10 +63,10 @@ export const UserManagement = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [searchableFilter, setSearchableFilter] = useState<string>('all');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState(getCookie('userManagement_searchTerm') || '');
+  const [statusFilter, setStatusFilter] = useState(getCookie('userManagement_statusFilter') || 'all');
+  const [searchableFilter, setSearchableFilter] = useState(getCookie('userManagement_searchableFilter') || 'all');
+  const [roleFilter, setRoleFilter] = useState(getCookie('userManagement_roleFilter') || 'all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [actionType, setActionType] = useState<UserAction | null>(null);
   const [showDialog, setShowDialog] = useState(false);
@@ -56,6 +78,27 @@ export const UserManagement = () => {
     fetchUsers();
     getCurrentUser();
   }, []);
+
+  // Filter change handlers that persist to cookies
+  const handleSearchTermChange = (value: string) => {
+    setSearchTerm(value);
+    setCookie('userManagement_searchTerm', value, 7);
+  };
+
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value);
+    setCookie('userManagement_statusFilter', value, 7);
+  };
+
+  const handleSearchableFilterChange = (value: string) => {
+    setSearchableFilter(value);
+    setCookie('userManagement_searchableFilter', value, 7);
+  };
+
+  const handleRoleFilterChange = (value: string) => {
+    setRoleFilter(value);
+    setCookie('userManagement_roleFilter', value, 7);
+  };
 
   const getCurrentUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -527,13 +570,13 @@ export const UserManagement = () => {
                 <Input
                   placeholder="Search users by name or email..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => handleSearchTermChange(e.target.value)}
                   className="pl-9"
                 />
               </div>
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={(e) => handleStatusFilterChange(e.target.value)}
                 className="px-3 py-2 border rounded-md"
               >
                 <option value="all">All Status</option>
@@ -543,7 +586,7 @@ export const UserManagement = () => {
               </select>
               <select
                 value={searchableFilter}
-                onChange={(e) => setSearchableFilter(e.target.value)}
+                onChange={(e) => handleSearchableFilterChange(e.target.value)}
                 className="px-3 py-2 border rounded-md"
               >
                 <option value="all">All Searchable</option>
@@ -552,7 +595,7 @@ export const UserManagement = () => {
               </select>
               <select
                 value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
+                onChange={(e) => handleRoleFilterChange(e.target.value)}
                 className="px-3 py-2 border rounded-md"
               >
                 <option value="all">All Roles</option>
