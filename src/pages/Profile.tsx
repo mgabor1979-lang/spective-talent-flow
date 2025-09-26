@@ -743,7 +743,7 @@ export const Profile = () => {
                     const levelPercentage = { junior: 25, medior: 50, senior: 75, expert: 90 }[level] || 50;
                     
                     return (
-                      <div key={index} className="space-y-2">
+                      <div key={index + '-' + skillName} className="space-y-2">
                         <div className="flex justify-between items-center">
                           <span className="text-sm font-medium">{skillName}</span>
                           <Badge variant="secondary" className="text-xs capitalize">
@@ -781,10 +781,9 @@ export const Profile = () => {
                     const langMatch = typeof language === 'string' ? language.match(/^(.+?)\s*\((.+?)\)$/) : null;
                     const langName = langMatch ? langMatch[1] : language;
                     const langLevel = langMatch ? langMatch[2] : 'intermediate';
-                    const flag = getCountryFlag(langName);
                     
                     return (
-                      <div key={index} className="flex items-center justify-between">
+                      <div key={index + '-' + langName} className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           
                           <span className="text-sm font-medium">{langName}</span>
@@ -820,7 +819,7 @@ export const Profile = () => {
                   {technologies.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {technologies.map((tech, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
+                        <Badge key={index + '-' + tech} variant="secondary" className="text-xs">
                           {tech}
                         </Badge>
                       ))}
@@ -898,7 +897,7 @@ export const Profile = () => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {workExperiences.length > 0 ? workExperiences.map((exp, index) => (
-                    <div key={index} className="border-l-2 border-primary/20 pl-6 relative">
+                    <div key={index + '-' + exp.position + '-' + exp.company} className="border-l-2 border-primary/20 pl-6 relative">
                       <div className="absolute w-3 h-3 bg-primary rounded-full -left-2 top-2"></div>
                       <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-2">
                         <h4 className="font-semibold text-lg">{exp.position}</h4>
@@ -933,7 +932,7 @@ export const Profile = () => {
                  </CardHeader>
                  <CardContent className="space-y-6">
                    {educations.length > 0 ? educations.map((edu, index) => (
-                     <div key={index} className="border-l-2 border-primary/20 pl-6 relative">
+                     <div key={index + '-' + edu.degree + '-' + edu.school} className="border-l-2 border-primary/20 pl-6 relative">
                        <div className="absolute w-3 h-3 bg-primary rounded-full -left-2 top-2"></div>
                        <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-2">
                          <h4 className="font-semibold text-lg">{edu.degree}</h4>
