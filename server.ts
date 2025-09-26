@@ -181,7 +181,7 @@ app.post("/api/delete-user", async (req, res) => {
 
     try {
       // 1. Read index.html
-      let template = await vite.transformIndexHtml(url, `
+      const template = await vite.transformIndexHtml(url, `
 <!DOCTYPE html>
 <html lang="en">
   <head>
