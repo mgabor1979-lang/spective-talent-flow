@@ -144,6 +144,53 @@ export const CVDocument = ({ profileData, parsedData, options }: CVDocumentProps
         </div>
       )}
 
+      {/* Languages & Technologies */}
+      <div className="grid grid-cols-2 gap-8 mb-8">
+        {/* Languages */}
+        {languages.length > 0 && (
+          <div>
+            <h2 className="text-xl font-bold mb-4 pb-2 border-b border-gray-200" style={{ color: '#2563eb' }}>
+              Languages
+            </h2>
+            <div className="space-y-2">
+              {languages.map((language, index) => {
+                const langMatch = typeof language === 'string' ? language.match(/^(.+?)\s*\((.+?)\)$/) : null;
+                const langName = langMatch ? langMatch[1] : language;
+                const langLevel = langMatch ? langMatch[2] : 'intermediate';
+                
+                return (
+                  <div key={`lang-${langName}-${index}`} className="flex justify-between items-center">
+                    <span className="font-medium">{langName}</span>
+                    <span className="text-xs bg-gray-100 px-2 py-1 rounded capitalize">
+                      {langLevel}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Technologies */}
+        {technologies.length > 0 && (
+          <div>
+            <h2 className="text-xl font-bold mb-4 pb-2 border-b border-gray-200" style={{ color: '#2563eb' }}>
+              Technologies & Tools
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {technologies.map((tech, index) => (
+                <span
+                  key={`tech-${tech}-${index}`}
+                  className="text-xs bg-gray-100 px-2 py-1 rounded"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Work Experience */}
       {workExperiences.length > 0 && (
         <div className="mb-8">
@@ -197,52 +244,7 @@ export const CVDocument = ({ profileData, parsedData, options }: CVDocumentProps
         </div>
       )}
 
-      {/* Languages & Technologies */}
-      <div className="grid grid-cols-2 gap-8 mb-8">
-        {/* Languages */}
-        {languages.length > 0 && (
-          <div>
-            <h2 className="text-xl font-bold mb-4 pb-2 border-b border-gray-200" style={{ color: '#2563eb' }}>
-              Languages
-            </h2>
-            <div className="space-y-2">
-              {languages.map((language, index) => {
-                const langMatch = typeof language === 'string' ? language.match(/^(.+?)\s*\((.+?)\)$/) : null;
-                const langName = langMatch ? langMatch[1] : language;
-                const langLevel = langMatch ? langMatch[2] : 'intermediate';
-                
-                return (
-                  <div key={`lang-${langName}-${index}`} className="flex justify-between items-center">
-                    <span className="font-medium">{langName}</span>
-                    <span className="text-xs bg-gray-100 px-2 py-1 rounded capitalize">
-                      {langLevel}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Technologies */}
-        {technologies.length > 0 && (
-          <div>
-            <h2 className="text-xl font-bold mb-4 pb-2 border-b border-gray-200" style={{ color: '#2563eb' }}>
-              Technologies & Tools
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {technologies.map((tech, index) => (
-                <span
-                  key={`tech-${tech}-${index}`}
-                  className="text-xs bg-gray-100 px-2 py-1 rounded"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      
 
       
 

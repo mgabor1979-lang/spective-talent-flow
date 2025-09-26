@@ -5,8 +5,32 @@ import {
     Text,
     View,
     StyleSheet,
-    Image
+    Image,
+    Font
 } from '@react-pdf/renderer';
+
+// Register Roboto font family with Hungarian character support
+Font.register({
+    family: 'Roboto',
+    fonts: [
+        {
+            src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-light-webfont.ttf',
+            fontWeight: 300,
+        },
+        {
+            src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf',
+            fontWeight: 'normal',
+        },
+        {
+            src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf',
+            fontWeight: 500,
+        },
+        {
+            src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-bold-webfont.ttf',
+            fontWeight: 'bold',
+        }
+    ]
+});
 
 // Define styles for the PDF document matching CVDocument exactly
 const styles = StyleSheet.create({
@@ -16,7 +40,7 @@ const styles = StyleSheet.create({
         padding: 30,
         fontSize: 12,
         lineHeight: 1.4,
-        fontFamily: 'Helvetica',
+        fontFamily: 'Roboto',
     },
 
     // Header Section Styles
@@ -451,49 +475,6 @@ export const CVPDFDocument = ({ profileData, parsedData, options }: CVPDFDocumen
                     </View>
                 )}
 
-                {/* Work Experience */}
-                {workExperiences.length > 0 && (
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Work Experience</Text>
-                        <View style={styles.experienceContainer}>
-                            {workExperiences.map((exp, index) => (
-                                <View key={`exp-${exp.position}-${exp.company}-${index}`} style={styles.experienceItem}>
-                                    <View style={styles.experienceDot}></View>
-                                    <View style={styles.experienceHeader}>
-                                        <Text style={styles.experienceTitle}>{exp.position}</Text>
-                                        <View style={styles.experienceCompanyRow}>
-                                            <Text style={styles.experienceCompany}>{exp.company}</Text>
-                                            <Text style={styles.experienceDuration}>{exp.duration}</Text>
-                                        </View>
-                                    </View>
-                                    <Text style={styles.experienceDescription}>{exp.description}</Text>
-                                </View>
-                            ))}
-                        </View>
-                    </View>
-                )}
-
-                {/* Education */}
-                {educations.length > 0 && (
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Education</Text>
-                        <View style={styles.educationContainer}>
-                            {educations.map((edu, index) => (
-                                <View key={`edu-${edu.degree}-${edu.school}-${index}`} style={styles.educationItem}>
-                                    <View style={styles.educationDot}></View>
-                                    <View style={styles.educationHeader}>
-                                        <View style={styles.educationLeft}>
-                                            <Text style={styles.educationTitle}>{edu.degree}</Text>
-                                            <Text style={styles.educationSchool}>{edu.school}</Text>
-                                        </View>
-                                        <Text style={styles.experienceDuration}>{edu.duration}</Text>
-                                    </View>
-                                </View>
-                            ))}
-                        </View>
-                    </View>
-                )}
-
                 {/* Languages & Technologies */}
                 {(languages.length > 0 || technologies.length > 0) && (
                     <View style={styles.twoColumnGrid}>
@@ -531,6 +512,53 @@ export const CVPDFDocument = ({ profileData, parsedData, options }: CVPDFDocumen
                                 </View>
                             </View>
                         )}
+                    </View>
+                )}
+
+                {/* Work Experience */}
+                {workExperiences.length > 0 && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Work Experience</Text>
+                        <View style={styles.experienceContainer}>
+                            {workExperiences.map((exp, index) => (
+                                <View key={`exp-${exp.position}-${exp.company}-${index}`} style={styles.experienceItem}>
+                                    <View style={styles.experienceDot}></View>
+                                    <View style={styles.experienceHeader}>
+                                        <Text style={styles.experienceTitle}>{exp.position}</Text>
+                                        <View style={styles.experienceCompanyRow}>
+                                            <Text style={styles.experienceCompany}>{exp.company}</Text>
+                                            <Text style={styles.experienceDuration}>{exp.duration}</Text>
+                                        </View>
+                                    </View>
+                                    <Text style={styles.experienceDescription}>{exp.description}</Text>
+                                </View>
+                            ))}
+                        </View>
+                    </View>
+                )}
+
+
+
+                
+
+                                {/* Education */}
+                {educations.length > 0 && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Education</Text>
+                        <View style={styles.educationContainer}>
+                            {educations.map((edu, index) => (
+                                <View key={`edu-${edu.degree}-${edu.school}-${index}`} style={styles.educationItem}>
+                                    <View style={styles.educationDot}></View>
+                                    <View style={styles.educationHeader}>
+                                        <View style={styles.educationLeft}>
+                                            <Text style={styles.educationTitle}>{edu.degree}</Text>
+                                            <Text style={styles.educationSchool}>{edu.school}</Text>
+                                        </View>
+                                        <Text style={styles.experienceDuration}>{edu.duration}</Text>
+                                    </View>
+                                </View>
+                            ))}
+                        </View>
                     </View>
                 )}
 
