@@ -43,6 +43,8 @@ export const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [searchableFilter, setSearchableFilter] = useState<string>('all');
+  const [roleFilter, setRoleFilter] = useState<string>('all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [actionType, setActionType] = useState<UserAction | null>(null);
   const [showDialog, setShowDialog] = useState(false);
@@ -62,7 +64,7 @@ export const UserManagement = () => {
 
   useEffect(() => {
     filterUsers();
-  }, [users, searchTerm, statusFilter]);
+  }, [users, searchTerm, statusFilter, searchableFilter, roleFilter]);
 
   const fetchUsers = async () => {
     try {
@@ -132,6 +134,23 @@ export const UserManagement = () => {
     // Status filter
     if (statusFilter !== 'all') {
       filtered = filtered.filter(user => user.registration_status === statusFilter);
+    }
+
+    // Searchable filter
+    if (searchableFilter !== 'all') {
+      filtered = filtered.filter(user => {
+        if (searchableFilter === 'searchable') {
+          return user.is_searchable === true;
+        } else if (searchableFilter === 'not-searchable') {
+          return user.is_searchable === false;
+        }
+        return true;
+      });
+    }
+
+    // Role filter
+    if (roleFilter !== 'all') {
+      filtered = filtered.filter(user => user.role === roleFilter);
     }
 
     setFilteredUsers(filtered);
@@ -521,6 +540,24 @@ export const UserManagement = () => {
                 <option value="pending">Pending</option>
                 <option value="approved">Approved</option>
                 <option value="rejected">Rejected</option>
+              </select>
+              <select
+                value={searchableFilter}
+                onChange={(e) => setSearchableFilter(e.target.value)}
+                className="px-3 py-2 border rounded-md"
+              >
+                <option value="all">All Searchable</option>
+                <option value="searchable">Searchable</option>
+                <option value="not-searchable">Not Searchable</option>
+              </select>
+              <select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                className="px-3 py-2 border rounded-md"
+              >
+                <option value="all">All Roles</option>
+                <option value="professional">Professional</option>
+                <option value="admin">Admin</option>
               </select>
             </div>
 
