@@ -17,6 +17,22 @@ import {
   ExternalLink
 } from 'lucide-react';
 
+class PartialProfessional {
+  user_id: string;
+  full_name: string;
+
+  constructor(user_id: string, full_name: string) {
+    this.user_id = user_id;
+    this.full_name = full_name;
+  }
+
+  public get profile_url() {
+    return `/profile/${this.user_id}`;
+  }
+}
+
+type ContactStatus = 'new' | 'contacted' | 'closed';
+
 interface ContactRequest {
   id: string;
   company_name: string;
@@ -25,8 +41,8 @@ interface ContactRequest {
   phone?: string;
   message: string;
   professional_id?: string;
-  professional_name?: string;
-  status: 'new' | 'contacted' | 'closed';
+  professional?: PartialProfessional | null;
+  status: ContactStatus;
   created_at: string;
   updated_at: string;
 }
@@ -63,41 +79,47 @@ export const ContactManagement = () => {
       } else if (error) {
         throw error;
       } else {
+
+        const { data: professionals } = await supabase
+          .from('profiles')
+          .select('user_id, full_name')
+          .in('user_id', contacts?.map(c => c.professional_id) || []);
+
         // Format the data properly
-        const formattedContacts = contacts?.map(contact => ({
-          id: contact.id,
-          company_name: contact.company_name,
-          contact_person: contact.contact_person,
-          email: contact.email,
-          phone: contact.phone,
-          message: contact.message,
-          professional_id: contact.professional_id,
-          professional_name: 'Unknown', // We'll fetch this separately if needed
-          status: contact.status as 'new' | 'contacted' | 'closed',
-          created_at: contact.created_at,
-          updated_at: contact.updated_at,
-        })) || [];
+        const formattedContacts: ContactRequest[] = contacts?.map(contact => {
+          const professionalData = professionals?.find(p => p.user_id === contact.professional_id);
+          let professional: PartialProfessional | null = null;
+          
+          if (professionalData) {
+            professional = new PartialProfessional(professionalData.user_id, professionalData.full_name);
+          } else if (contact.professional_id) {
+            professional = new PartialProfessional(contact.professional_id, 'Unknown Professional');
+          }
+
+          return {
+            id: contact.id,
+            company_name: contact.company_name,
+            contact_person: contact.contact_person,
+            email: contact.email,
+            phone: contact.phone,
+            message: contact.message,
+            professional_id: contact.professional_id,
+            professional: professional,
+            status: contact.status as ContactStatus,
+            created_at: contact.created_at,
+            updated_at: contact.updated_at,
+          };
+        }) || [];
+        console.log(formattedContacts);
         setContacts(formattedContacts);
       }
     } catch (error) {
       console.error('Error fetching contacts:', error);
-      // For now, let's use mock data
-      const mockContacts: ContactRequest[] = [
-        {
-          id: '1',
-          company_name: 'Tech Solutions Inc.',
-          contact_person: 'John Smith',
-          email: 'john.smith@techsolutions.com',
-          phone: '+1-555-123-4567',
-          message: 'We are looking for a senior developer for our digital transformation project.',
-          professional_id: 'prof-1',
-          professional_name: 'Jane Developer',
-          status: 'new',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ];
-      setContacts(mockContacts);
+      toast({
+        title: "Error",
+        description: "Failed to fetch contact requests",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -123,7 +145,7 @@ export const ContactManagement = () => {
     setFilteredContacts(filtered);
   };
 
-  const updateContactStatus = async (contactId: string, newStatus: 'new' | 'contacted' | 'closed') => {
+  const updateContactStatus = async (contactId: string, newStatus: ContactStatus) => {
     try {
       // Try to update the contact status in the database
       const { error } = await supabase
@@ -178,8 +200,8 @@ export const ContactManagement = () => {
         </CardHeader>
         <CardContent>
           <div className="animate-pulse space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-16 bg-muted rounded"></div>
+            {Array.from({ length: 5 }, (_, i) => (
+              <div key={`loading-skeleton-row-${i}`} className="h-16 bg-muted rounded"></div>
             ))}
           </div>
         </CardContent>
@@ -264,7 +286,7 @@ export const ContactManagement = () => {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>{contact.professional_name || 'General Inquiry'}</TableCell>
+                      <TableCell><a href={contact.professional?.profile_url || '#'} target="_blank">{contact.professional?.full_name || 'General Inquiry'}</a></TableCell>
                       <TableCell>{getStatusBadge(contact.status)}</TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-1 text-sm text-muted-foreground">
@@ -373,14 +395,14 @@ export const ContactManagement = () => {
                 </div>
               </div>
 
-              {selectedContact.professional_name && (
+              {selectedContact.professional && (
                 <div>
                   <h4 className="font-semibold">Interested in Professional</h4>
                   <div className="mt-2 flex items-center justify-between">
-                    <span>{selectedContact.professional_name}</span>
+                    <span>{selectedContact.professional.full_name}</span>
                     {selectedContact.professional_id && (
                       <Button size="sm" variant="outline" asChild>
-                        <a href={`/profile/${selectedContact.professional_id}`} target="_blank">
+                        <a href={selectedContact.professional?.profile_url || '#'} target="_blank">
                           <ExternalLink className="h-4 w-4 mr-1" />
                           View Profile
                         </a>
