@@ -14,7 +14,8 @@ import {
   Mail,
   Phone,
   Calendar,
-  ExternalLink
+  ExternalLink,
+  Trash2
 } from 'lucide-react';
 
 class PartialProfessional {
@@ -58,6 +59,8 @@ export const ContactManagement = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedContact, setSelectedContact] = useState<ContactRequest | null>(null);
   const [showContactDialog, setShowContactDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [contactToDelete, setContactToDelete] = useState<ContactRequest | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -183,6 +186,47 @@ export const ContactManagement = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const deleteContact = async (contactId: string) => {
+    try {
+      // Try to delete the contact from the database
+      const { error } = await supabase
+        .from('contact_requests')
+        .delete()
+        .eq('id', contactId);
+
+      if (error && error.code !== '42P01') throw error;
+
+      // Update local state
+      setContacts(prev => prev.filter(contact => contact.id !== contactId));
+      
+      // Close dialogs if the deleted contact was selected
+      if (selectedContact?.id === contactId) {
+        setShowContactDialog(false);
+        setSelectedContact(null);
+      }
+
+      toast({
+        title: "Success",
+        description: "Contact request deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting contact:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete contact request",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeleteDialog(false);
+      setContactToDelete(null);
+    }
+  };
+
+  const handleDeleteClick = (contact: ContactRequest) => {
+    setContactToDelete(contact);
+    setShowDeleteDialog(true);
   };
 
   const getStatusBadge = (status: string) => {
@@ -312,6 +356,14 @@ export const ContactManagement = () => {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleDeleteClick(contact)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                           {contact.status === 'new' && (
                             <Button
                               size="sm"
@@ -439,8 +491,52 @@ export const ContactManagement = () => {
                   </div>
                 </div>
               )}
+
+              <div className="flex justify-end space-x-2 mt-6">
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDeleteClick(selectedContact)}
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Delete Request
+                </Button>
+              </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Contact Request</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p>Are you sure you want to delete this contact request?</p>
+            {contactToDelete && (
+              <div className="p-3 bg-muted rounded-md">
+                <p className="font-medium">{contactToDelete.company_name}</p>
+                <p className="text-sm text-muted-foreground">{contactToDelete.contact_person} - {contactToDelete.email}</p>
+              </div>
+            )}
+            <p className="text-sm text-destructive">This action cannot be undone.</p>
+          </div>
+          <div className="flex justify-end space-x-2 mt-6">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => contactToDelete && deleteContact(contactToDelete.id)}
+            >
+              Delete
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
