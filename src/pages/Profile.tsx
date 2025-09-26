@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Edit, Heart, CheckCircle, XCircle } from 'lucide-react';
+import { Edit, Heart, CheckCircle, XCircle, FileText } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +18,7 @@ import { EditWorkExperienceModal } from '@/components/profile/EditWorkExperience
 import { EditEducationModal } from '@/components/profile/EditEducationModal';
 import { EditAvailabilityModal } from '@/components/profile/EditAvailabilityModal';
 import { ContactProfessionalModal } from '@/components/ContactProfessionalModal';
+import { CVGenerationModal } from '@/components/profile/CVGenerationModal';
 import { InfoCard } from '@/components/profile/InfoCard';
 import { DATA_SEPARATORS } from '@/lib/data-separators';
 import { useFavorites } from '@/hooks/use-favorites';
@@ -274,6 +275,7 @@ export const Profile = () => {
   const [editWorkExperienceOpen, setEditWorkExperienceOpen] = useState(false);
   const [editEducationOpen, setEditEducationOpen] = useState(false);
   const [contactModalOpen, setContactModalOpen] = useState(false);
+  const [cvGenerationOpen, setCvGenerationOpen] = useState(false);
 
   // Memoized parsed data to prevent unnecessary re-renders and maintain stable references
   const parsedData = useMemo(() => {
@@ -693,6 +695,20 @@ export const Profile = () => {
                 </Button>
               </div>
             )}
+
+            {/* Generate CV Button - Only show for admins */}
+            {currentUser && isAdmin && !isOwner && profileData.role === 'professional' && (
+              <div className="flex items-center space-x-4">
+                <Button
+                  onClick={() => setCvGenerationOpen(true)}
+                  size="lg"
+                  className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <FileText className="h-5 w-5" />
+                  <span>Generate CV</span>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -1039,6 +1055,16 @@ export const Profile = () => {
         professionalId={profileData.user_id}
         professionalName={canSeeFullName ? profileData.full_name.split(' ')[0] : getFirstName(profileData.full_name)}
       />
+
+      {/* CV Generation Modal */}
+      {isAdmin && (
+        <CVGenerationModal
+          isOpen={cvGenerationOpen}
+          onClose={() => setCvGenerationOpen(false)}
+          profileData={profileData}
+          parsedData={parsedData}
+        />
+      )}
     </Layout>
   );
 };
