@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +23,21 @@ export const Admin = () => {
   const [currentUser, setCurrentUser] = useState<SupabaseUser | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Valid tab values
+  const validTabs = ['dashboard', 'users', 'companies', 'contacts', 'settings'];
+  
+  // Get current tab from URL, default to 'dashboard'
+  const urlTab = searchParams.get('tab');
+  const currentTab = urlTab && validTabs.includes(urlTab) ? urlTab : 'dashboard';
+  
+  // Handle tab change and update URL
+  const handleTabChange = (value: string) => {
+    if (validTabs.includes(value)) {
+      setSearchParams({ tab: value });
+    }
+  };
 
   useEffect(() => {
     const checkAdminAccess = async () => {
@@ -86,7 +101,7 @@ export const Admin = () => {
         </div>
 
         {/* Admin Tabs */}
-        <Tabs defaultValue="dashboard" className="space-y-6">
+        <Tabs value={currentTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="dashboard" className="flex items-center space-x-2">
               <BarChart3 className="h-4 w-4" />
