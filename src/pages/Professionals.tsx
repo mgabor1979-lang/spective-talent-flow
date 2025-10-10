@@ -270,7 +270,7 @@ export const Professionals = () => {
     }
 
     const results = fuse.search(searchQuery);
-    return results.map(result => result.item);
+    return results.filter(result => result.score !== undefined && result.score > 0.3).map(result => result.item);
   }, [professionals, searchQuery, fuse]);
 
   if (loading) {
