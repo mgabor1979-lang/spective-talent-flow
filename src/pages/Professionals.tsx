@@ -234,10 +234,10 @@ export const Professionals = () => {
   // Configure Fuse.js for fuzzy search - professional info + names + company names
   const fuseOptions = {
     keys: [
+      { name: 'full_name', weight: 5 },        // Include names for search
       { name: 'work_experience', weight: 3 },  // Highest priority - work experience (includes company names)
       { name: 'education', weight: 3 },        // Highest priority - education
       { name: 'skills', weight: 2.5 },         // High priority - skills
-      { name: 'full_name', weight: 2 },        // Include names for search
       { name: 'technologies', weight: 2 },     // Medium priority - technologies  
       { name: 'languages', weight: 1.5 },     // Lower priority - languages
     ],
@@ -339,7 +339,7 @@ export const Professionals = () => {
             // Use age from backend if available, otherwise calculate from birth_date
             const age = professional.age || (professional.birth_date ? calculateAge(professional.birth_date) : null);
             const experienceSummary = getExperienceSummary(professional.work_experience || '');
-            const firstName = getFirstName(professional.full_name);
+            const firstName = professional.full_name; // getFirstName(professional.full_name);
             const surname = getSurname(professional.full_name);
 
             return (
