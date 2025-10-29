@@ -639,7 +639,7 @@ export const Profile = () => {
               </Avatar>
               <div>
                 <h1 className="text-4xl font-bold mb-2">
-                  {displayName}
+                  {profileData.full_name}
                   {Boolean(age) && <span className="text-xl text-muted-foreground ml-2">({age} years old)</span>}
                 </h1>
                 <p className="text-xl text-muted-foreground capitalize">{profileData.role}</p>
