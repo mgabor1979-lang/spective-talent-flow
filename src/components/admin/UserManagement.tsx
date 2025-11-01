@@ -12,13 +12,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEmail } from '@/hooks/use-email';
 import { Switch } from '@/components/ui/switch';
-import { 
-  Search, 
-  Eye, 
-  CheckCircle, 
-  XCircle, 
-  Ban, 
-  Trash2, 
+import {
+  Search,
+  Eye,
+  CheckCircle,
+  XCircle,
+  Ban,
+  Trash2,
   RotateCcw
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -50,6 +50,7 @@ interface User {
   user_id: string;
   full_name: string;
   email: string;
+  phone: string;
   role: string;
   created_at: string;
   registration_status?: string;
@@ -156,7 +157,8 @@ export const UserManagement = () => {
           registration_status: registrationRequest?.status || 'none',
           profile_status: professionalProfile?.profile_status || 'none',
           is_searchable: professionalProfile?.is_searchable || false,
-          profile_image: profileImage?.src || null
+          profile_image: profileImage?.src || null,
+          phone: profile.phone
         };
       }) || [];
 
@@ -178,7 +180,7 @@ export const UserManagement = () => {
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(user => 
+      filtered = filtered.filter(user =>
         user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -255,7 +257,7 @@ export const UserManagement = () => {
     // Update registration request
     await supabase
       .from('registration_requests')
-      .update({ 
+      .update({
         status: 'approved',
         approved_at: new Date().toISOString(),
         approved_by: (await supabase.auth.getUser()).data.user?.id
@@ -276,7 +278,7 @@ export const UserManagement = () => {
         user.email,
         loginUrl
       );
-      
+
       if (!emailResult.success) {
         console.error('Failed to send approval email:', emailResult.error);
         // Don't throw error - approval succeeded even if email failed
@@ -295,7 +297,7 @@ export const UserManagement = () => {
   const rejectUser = async (user: User) => {
     await supabase
       .from('registration_requests')
-      .update({ 
+      .update({
         status: 'rejected',
         approved_at: new Date().toISOString(),
         approved_by: (await supabase.auth.getUser()).data.user?.id
@@ -310,7 +312,7 @@ export const UserManagement = () => {
         undefined, // No specific reason provided
         'support@spective-talent-flow.com'
       );
-      
+
       if (!emailResult.success) {
         console.error('Failed to send rejection email:', emailResult.error);
         // Don't throw error - rejection succeeded even if email failed
@@ -340,7 +342,7 @@ export const UserManagement = () => {
         'Your account has been suspended due to policy violations.',
         'support@spective-talent-flow.com'
       );
-      
+
       if (!emailResult.success) {
         console.error('Failed to send ban email:', emailResult.error);
         // Don't throw error - ban succeeded even if email failed
@@ -406,7 +408,7 @@ export const UserManagement = () => {
           // Set registration status back to pending
           await supabase
             .from('registration_requests')
-            .update({ 
+            .update({
               status: 'pending',
               approved_at: null,
               approved_by: null
@@ -490,13 +492,12 @@ export const UserManagement = () => {
         <PopoverContent className="w-48 p-2">
           <div className="space-y-1">
             <p className="text-sm font-medium mb-2">Change Status</p>
-            
+
             <Button
               size="sm"
               variant="ghost"
-              className={`w-full justify-start hover:bg-orange-50 ${
-                registration_status === 'pending' ? 'bg-orange-50 text-orange-800' : 'text-orange-600'
-              }`}
+              className={`w-full justify-start hover:bg-orange-50 ${registration_status === 'pending' ? 'bg-orange-50 text-orange-800' : 'text-orange-600'
+                }`}
               onClick={() => handleQuickStatusChange(user, 'pending')}
               disabled={registration_status === 'pending'}
             >
@@ -507,11 +508,10 @@ export const UserManagement = () => {
             <Button
               size="sm"
               variant="ghost"
-              className={`w-full justify-start hover:bg-green-50 ${
-                registration_status === 'approved' && profile_status === 'approved' 
-                  ? 'bg-green-50 text-green-800' 
-                  : 'text-green-600'
-              }`}
+              className={`w-full justify-start hover:bg-green-50 ${registration_status === 'approved' && profile_status === 'approved'
+                ? 'bg-green-50 text-green-800'
+                : 'text-green-600'
+                }`}
               onClick={() => handleQuickStatusChange(user, 'approve')}
               disabled={registration_status === 'approved' && profile_status === 'approved'}
             >
@@ -522,15 +522,14 @@ export const UserManagement = () => {
             <Button
               size="sm"
               variant="ghost"
-              className={`w-full justify-start hover:bg-red-50 ${
-                registration_status === 'rejected' || profile_status === 'rejected'
-                  ? 'bg-red-50 text-red-800' 
-                  : 'text-red-600'
-              } ${user.user_id === currentUserId ? 'opacity-50' : ''}`}
+              className={`w-full justify-start hover:bg-red-50 ${registration_status === 'rejected' || profile_status === 'rejected'
+                ? 'bg-red-50 text-red-800'
+                : 'text-red-600'
+                } ${user.user_id === currentUserId ? 'opacity-50' : ''}`}
               onClick={() => handleQuickStatusChange(user, 'reject')}
               disabled={
-                registration_status === 'rejected' || 
-                profile_status === 'rejected' || 
+                registration_status === 'rejected' ||
+                profile_status === 'rejected' ||
                 user.user_id === currentUserId
               }
             >
@@ -620,7 +619,7 @@ export const UserManagement = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>User</TableHead>
-                    <TableHead>Email</TableHead>
+                    <TableHead>Contact info</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Searchable</TableHead>
@@ -631,21 +630,42 @@ export const UserManagement = () => {
                 <TableBody>
                   {filteredUsers.map((user) => (
                     <TableRow key={user.id}>
-                      <TableCell className="flex items-center space-x-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={user.profile_image || undefined} />
-                          <AvatarFallback>
-                            {user.full_name.split(' ')
-                              .filter(np=>
-                                np.trim().length>0 
-                                && np.trim().toLowerCase() !== 'dr.' 
-                                && !np.trim().includes('['))
-                              .map(n => n[0]).join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="font-medium">{user.full_name}</span>
+                      <TableCell>
+                        <div className="flex items-center space-x-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={user.profile_image || undefined} />
+                            <AvatarFallback>
+                              {user.full_name.split(' ')
+                                .filter(np =>
+                                  np.trim().length > 0
+                                  && np.trim().toLowerCase() !== 'dr.'
+                                  && !np.trim().includes('['))
+                                .map(n => n[0]).join('')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium">{user.full_name}</span>
+                        </div>
                       </TableCell>
-                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1">
+                          {user.email && (
+                            <a
+                              href={`mailto:${user.email}`}
+                              className="text-blue-600 hover:underline"
+                            >
+                              {user.email}
+                            </a>
+                          )}
+                          {user.phone && (
+                            <a
+                              href={`tel:${user.phone}`}
+                              className="text-blue-600 hover:underline"
+                            >
+                              {user.phone}
+                            </a>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell className="capitalize">{user.role}</TableCell>
                       <TableCell>
                         {getStatusBadge(user.registration_status || '', user.profile_status || '', user)}
@@ -684,13 +704,13 @@ export const UserManagement = () => {
                               <p>View Profile</p>
                             </TooltipContent>
                           </Tooltip>
-                          
+
                           {user.registration_status === 'pending' && (
                             <>
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Button 
-                                    size="sm" 
+                                  <Button
+                                    size="sm"
                                     variant="ghost"
                                     onClick={() => openActionDialog(user, 'approve')}
                                   >
@@ -703,8 +723,8 @@ export const UserManagement = () => {
                               </Tooltip>
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Button 
-                                    size="sm" 
+                                  <Button
+                                    size="sm"
                                     variant="ghost"
                                     onClick={() => openActionDialog(user, 'reject')}
                                   >
@@ -717,11 +737,11 @@ export const UserManagement = () => {
                               </Tooltip>
                             </>
                           )}
-                          
+
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button 
-                                size="sm" 
+                              <Button
+                                size="sm"
                                 variant="ghost"
                                 onClick={() => openActionDialog(user, 'reset-password')}
                               >
@@ -732,12 +752,12 @@ export const UserManagement = () => {
                               <p>Reset Password</p>
                             </TooltipContent>
                           </Tooltip>
-                          
+
                           {user.profile_status !== 'rejected' && user.user_id !== currentUserId && (
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Button 
-                                  size="sm" 
+                                <Button
+                                  size="sm"
                                   variant="ghost"
                                   onClick={() => openActionDialog(user, 'ban')}
                                 >
@@ -749,12 +769,12 @@ export const UserManagement = () => {
                               </TooltipContent>
                             </Tooltip>
                           )}
-                          
+
                           {user.user_id !== currentUserId && (
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Button 
-                                  size="sm" 
+                                <Button
+                                  size="sm"
                                   variant="ghost"
                                   onClick={() => openActionDialog(user, 'delete')}
                                 >
@@ -784,19 +804,19 @@ export const UserManagement = () => {
                 Confirm {actionType === 'reset-password' ? 'Password Reset' : actionType?.charAt(0).toUpperCase() + actionType?.slice(1)}
               </AlertDialogTitle>
               <AlertDialogDescription>
-                {actionType === 'delete' && 
+                {actionType === 'delete' &&
                   "This action cannot be undone. This will permanently delete the user account and all associated data."
                 }
-                {actionType === 'ban' && 
+                {actionType === 'ban' &&
                   "This will ban the user from the platform. They will not be able to access their account."
                 }
-                {actionType === 'approve' && 
+                {actionType === 'approve' &&
                   "This will approve the user's registration and allow them to access the platform."
                 }
-                {actionType === 'reject' && 
+                {actionType === 'reject' &&
                   "This will reject the user's registration. They will not be able to access the platform."
                 }
-                {actionType === 'reset-password' && 
+                {actionType === 'reset-password' &&
                   "This will send a password reset email to the user."
                 }
               </AlertDialogDescription>
