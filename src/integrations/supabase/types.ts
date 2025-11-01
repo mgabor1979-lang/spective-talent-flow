@@ -467,6 +467,38 @@ export type Database = {
         }
         Relationships: []
       }
+      profileimages: {
+        Row: {
+          uid: string
+          src: string
+          cloudinary_public_id: string | null
+          created: string | null
+          updated: string | null
+        }
+        Insert: {
+          uid: string
+          src: string
+          cloudinary_public_id?: string | null
+          created?: string | null
+          updated?: string | null
+        }
+        Update: {
+          uid?: string
+          src?: string
+          cloudinary_public_id?: string | null
+          created?: string | null
+          updated?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profileimages_uid_fkey"
+            columns: ["uid"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          }
+        ]
+      }
       scheduled_availability_emails: {
         Row: {
           id: string

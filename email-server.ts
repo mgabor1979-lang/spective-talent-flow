@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { createClient } from "@supabase/supabase-js";
 import { put, del } from "@vercel/blob";
+import { v2 as cloudinary } from "cloudinary";
+import formidable from "formidable";
 
 // Load environment variables
 dotenv.config();
@@ -34,6 +36,19 @@ app.use(
 
 // Parse JSON bodies
 app.use(express.json());
+
+// Configure Cloudinary
+if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+        secure: true
+    });
+    console.log("✅ Cloudinary configured");
+} else {
+    console.warn("⚠️  Cloudinary not configured - image upload will not work");
+}
 
 // Initialize Resend with validation
 if (!process.env.RESEND_API_KEY) {
@@ -250,6 +265,150 @@ app.delete("/api/delete-terms", async (req, res) => {
     } catch (error) {
         console.error('Delete terms error:', error);
         res.status(500).json({ error: 'Failed to delete file' });
+    }
+});
+
+// Cloudinary upload endpoint
+app.post("/api/cloudinary/upload", async (req, res) => {
+    try {
+        // Check Cloudinary configuration
+        if (!process.env.CLOUDINARY_CLOUD_NAME || 
+            !process.env.CLOUDINARY_API_KEY || 
+            !process.env.CLOUDINARY_API_SECRET) {
+            return res.status(500).json({ error: 'Cloudinary not configured' });
+        }
+
+        const form = formidable({
+            maxFileSize: 10 * 1024 * 1024, // 10MB
+            keepExtensions: true,
+            allowEmptyFiles: false,
+        });
+
+        const [fields, files] = await form.parse(req);
+        
+        const fileArray = files.file;
+        if (!fileArray || fileArray.length === 0) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+
+        const file = fileArray[0];
+
+        // Validate file type
+        const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+        if (!allowedMimeTypes.includes(file.mimetype || '')) {
+            return res.status(400).json({ 
+                error: 'Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed.' 
+            });
+        }
+
+        // Prepare upload options
+        const uploadOptions: any = {
+            resource_type: 'image',
+            folder: fields.folder?.[0] || 'spective-uploads',
+            use_filename: true,
+            unique_filename: true,
+            overwrite: false,
+        };
+
+        if (fields.publicId && fields.publicId[0]) {
+            uploadOptions.public_id = fields.publicId[0];
+            uploadOptions.overwrite = true;
+        }
+
+        if (fields.tags && fields.tags[0]) {
+            try {
+                uploadOptions.tags = JSON.parse(fields.tags[0]);
+            } catch (e) {
+                console.warn('Failed to parse tags:', e);
+            }
+        }
+
+        if (fields.transformation && fields.transformation[0]) {
+            try {
+                uploadOptions.transformation = JSON.parse(fields.transformation[0]);
+            } catch (e) {
+                console.warn('Failed to parse transformation:', e);
+            }
+        }
+
+        // Upload to Cloudinary
+        const result = await cloudinary.uploader.upload(file.filepath, uploadOptions);
+
+        res.status(200).json({
+            success: true,
+            publicId: result.public_id,
+            url: result.url,
+            secureUrl: result.secure_url,
+            width: result.width,
+            height: result.height,
+            format: result.format,
+            resourceType: result.resource_type,
+            bytes: result.bytes,
+            createdAt: result.created_at,
+        });
+
+    } catch (error) {
+        console.error('Cloudinary upload error:', error);
+        res.status(500).json({ 
+            error: 'Failed to upload image',
+            details: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+
+// Cloudinary delete endpoint
+app.post("/api/cloudinary/delete", async (req, res) => {
+    try {
+        // Check Cloudinary configuration
+        if (!process.env.CLOUDINARY_CLOUD_NAME || 
+            !process.env.CLOUDINARY_API_KEY || 
+            !process.env.CLOUDINARY_API_SECRET) {
+            return res.status(500).json({ error: 'Cloudinary not configured' });
+        }
+
+        const { publicId } = req.body;
+
+        if (!publicId) {
+            return res.status(400).json({ error: 'Public ID is required' });
+        }
+
+        // Validate public ID format
+        if (typeof publicId !== 'string' || publicId.length === 0 || publicId.length > 500) {
+            return res.status(400).json({ error: 'Invalid public ID format' });
+        }
+
+        // Delete from Cloudinary
+        const result = await cloudinary.uploader.destroy(publicId, {
+            resource_type: 'image',
+            invalidate: true,
+        });
+
+        if (result.result === 'ok') {
+            res.status(200).json({
+                success: true,
+                result: result.result,
+                message: 'Image deleted successfully'
+            });
+        } else if (result.result === 'not found') {
+            res.status(404).json({
+                success: false,
+                error: 'Image not found',
+                result: result.result
+            });
+        } else {
+            res.status(400).json({
+                success: false,
+                error: 'Failed to delete image',
+                result: result.result
+            });
+        }
+
+    } catch (error) {
+        console.error('Cloudinary delete error:', error);
+        res.status(500).json({ 
+            error: 'Failed to delete image',
+            details: error instanceof Error ? error.message : 'Unknown error'
+        });
     }
 });
 

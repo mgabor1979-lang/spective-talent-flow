@@ -22,8 +22,11 @@ import { CVGenerationModal } from '@/components/profile/CVGenerationModal';
 import { InfoCard } from '@/components/profile/InfoCard';
 import { DATA_SEPARATORS } from '@/lib/data-separators';
 import { useFavorites } from '@/hooks/use-favorites';
+import { useProfileImage } from '@/hooks/use-profile-image';
 import { isCompanyUser } from '@/lib/auth-utils';
 import { formatDistance, calculateCachedDistance } from '@/lib/distance-utils';
+import { ImageCropModal } from '@/components/profile/ImageCropModal';
+import { ProfilePictureBadges } from '@/components/profile/ProfilePictureBadges';
 
 // Helper function to extract first name (last part of full name in Hungarian convention)
 const getFirstName = (fullName: string): string => {
@@ -265,6 +268,16 @@ export const Profile = () => {
     isCompany ? currentUser?.id : undefined
   );
   
+  // Profile image management
+  const { 
+    profileImage, 
+    uploading: imageUploading, 
+    deleting: imageDeleting,
+    uploadProfileImage,
+    deleteProfileImage,
+    refreshProfileImage
+  } = useProfileImage();
+  
   // Modal states
   const [editPersonalInfoOpen, setEditPersonalInfoOpen] = useState(false);
   const [editAvailabilityOpen, setEditAvailabilityOpen] = useState(false);
@@ -276,6 +289,7 @@ export const Profile = () => {
   const [editEducationOpen, setEditEducationOpen] = useState(false);
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [cvGenerationOpen, setCvGenerationOpen] = useState(false);
+  const [imageCropModalOpen, setImageCropModalOpen] = useState(false);
 
   // Memoized parsed data to prevent unnecessary re-renders and maintain stable references
   const parsedData = useMemo(() => {
@@ -459,6 +473,13 @@ export const Profile = () => {
     loadProfile();
   }, [userId]);
 
+  // Load profile image when profileData is available
+  useEffect(() => {
+    if (profileData?.user_id) {
+      refreshProfileImage(profileData.user_id);
+    }
+  }, [profileData?.user_id, refreshProfileImage]);
+
   // Calculate distance when company address and professional city are available
   useEffect(() => {
     const calculateDistance = async () => {
@@ -608,6 +629,24 @@ export const Profile = () => {
   const isOwner = currentUser?.id === profileData.user_id;
   const shouldShowCTA = !isAdmin && !isOwner;
   const canSeeFullName = isAdmin || isOwner;
+  const canEditProfilePicture = isOwner || isAdmin;
+
+  // Profile image handlers
+  const handleUploadImage = () => {
+    setImageCropModalOpen(true);
+  };
+
+  const handleSaveImage = async (croppedImage: Blob) => {
+    if (profileData?.user_id) {
+      await uploadProfileImage(croppedImage, profileData.user_id);
+    }
+  };
+
+  const handleDeleteImage = async () => {
+    if (profileData?.user_id) {
+      await deleteProfileImage(profileData.user_id);
+    }
+  };
   
   // Use age from backend if available, otherwise calculate from birth_date
   const age = profileData.age || (profileData.birth_date ? calculateAge(profileData.birth_date) : null);
@@ -631,12 +670,22 @@ export const Profile = () => {
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src="/images/maleavatar.png" />
-                <AvatarFallback className="text-2xl font-bold">
-                  {displayNameForAvatar}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className="h-24 w-24">
+                  <AvatarImage src={profileImage?.src || "/images/maleavatar.png"} />
+                  <AvatarFallback className="text-2xl font-bold">
+                    {displayNameForAvatar}
+                  </AvatarFallback>
+                </Avatar>
+                {canEditProfilePicture && (
+                  <ProfilePictureBadges
+                    hasImage={!!profileImage}
+                    onUpload={handleUploadImage}
+                    onDelete={handleDeleteImage}
+                    disabled={imageUploading || imageDeleting}
+                  />
+                )}
+              </div>
               <div>
                 <h1 className="text-4xl font-bold mb-2">
                   {profileData.full_name}
@@ -1063,6 +1112,15 @@ export const Profile = () => {
           onClose={() => setCvGenerationOpen(false)}
           profileData={profileData}
           parsedData={parsedData}
+        />
+      )}
+
+      {/* Image Crop Modal */}
+      {canEditProfilePicture && (
+        <ImageCropModal
+          open={imageCropModalOpen}
+          onClose={() => setImageCropModalOpen(false)}
+          onSave={handleSaveImage}
         />
       )}
     </Layout>
