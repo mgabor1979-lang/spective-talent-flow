@@ -48,6 +48,11 @@ Spective is a modern web application built to facilitate connections between ski
 - **Comprehensive email templates** for all user interactions
 - **Automated cron jobs** for scheduled notifications
 
+### File Storage & Media
+- **Cloudinary** for secure image upload and management
+- **Rate limiting** to prevent spam and abuse
+- **Image transformations** for optimized delivery
+
 ### Deployment & Infrastructure
 - **Vercel** for hosting and serverless functions
 - **Vercel Cron Jobs** for automated tasks
@@ -187,6 +192,7 @@ Use the built-in email testing component available to administrators.
 ## 📚 Documentation
 
 - [Email System Guide](./EMAIL_SERVICE_GUIDE.md)
+- [Cloudinary Setup](./CLOUDINARY_SETUP.md)
 - [Cron Jobs Documentation](./CRON_JOBS.md)
 - [Company File Management](./COMPANY_FILE_MANAGEMENT.md)
 - [Document Management](./DOCUMENT_MANAGEMENT.md)
