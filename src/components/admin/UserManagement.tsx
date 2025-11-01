@@ -55,6 +55,7 @@ interface User {
   registration_status?: string;
   profile_status?: string;
   is_searchable?: boolean;
+  profile_image?: string | null;
 }
 
 type UserAction = 'approve' | 'reject' | 'ban' | 'delete' | 'reset-password';
@@ -133,9 +134,17 @@ export const UserManagement = () => {
 
       if (profError) throw profError;
 
+      // Get profile images
+      const { data: profileImages, error: imagesError } = await supabase
+        .from('profileimages')
+        .select('*');
+
+      if (imagesError) throw imagesError;
+
       const formattedUsers = profiles?.map(profile => {
         const registrationRequest = registrationRequests?.find(req => req.user_id === profile.user_id);
         const professionalProfile = professionalProfiles?.find(prof => prof.user_id === profile.user_id);
+        const profileImage = profileImages?.find(img => img.uid === profile.user_id);
 
         return {
           id: profile.id,
@@ -146,7 +155,8 @@ export const UserManagement = () => {
           created_at: profile.created_at,
           registration_status: registrationRequest?.status || 'none',
           profile_status: professionalProfile?.profile_status || 'none',
-          is_searchable: professionalProfile?.is_searchable || false
+          is_searchable: professionalProfile?.is_searchable || false,
+          profile_image: profileImage?.src || null
         };
       }) || [];
 
@@ -623,9 +633,14 @@ export const UserManagement = () => {
                     <TableRow key={user.id}>
                       <TableCell className="flex items-center space-x-3">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src="/placeholder.svg" />
+                          <AvatarImage src={user.profile_image || undefined} />
                           <AvatarFallback>
-                            {user.full_name.split(' ').map(n => n[0]).join('')}
+                            {user.full_name.split(' ')
+                              .filter(np=>
+                                np.trim().length>0 
+                                && np.trim().toLowerCase() !== 'dr.' 
+                                && !np.trim().includes('['))
+                              .map(n => n[0]).join('')}
                           </AvatarFallback>
                         </Avatar>
                         <span className="font-medium">{user.full_name}</span>

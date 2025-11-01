@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Search, User, Loader2, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -29,6 +29,7 @@ interface Professional {
   distance?: number;
   available?: boolean;
   available_from?: string;
+  profile_image?: string;
 }
 
 // Helper function to calculate age
@@ -200,6 +201,7 @@ export const Professionals = () => {
           city: item.city || '',
           available: item.available,
           available_from: item.availablefrom,
+          profile_image: item.profile_image_src || null,
         }));
 
         // Calculate distances for company users
@@ -347,6 +349,7 @@ export const Professionals = () => {
                 <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex items-center space-x-4 mb-4">
                     <Avatar className="h-16 w-16">
+                      <AvatarImage src={professional.profile_image || undefined} />
                       <AvatarFallback className="bg-spective-accent text-white text-lg">
                         {surname.charAt(0)}
                       </AvatarFallback>

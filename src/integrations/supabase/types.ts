@@ -609,8 +609,10 @@ export type Database = {
           languages: string[]
           technologies: string[]
           city: string
+          range: number | null
           available: boolean
           availablefrom: string | null
+          profile_image_src: string | null
         }[]
       }
       get_profile_for_public: {

@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Heart, Eye, FileText, Settings, MapPin, CheckCircle, XCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { isApprovedCompanyUser } from '@/lib/auth-utils';
@@ -17,7 +18,7 @@ import { formatDistance, batchCalculateDistances } from '@/lib/distance-utils';
 // Helper function to get availability text and color
 const getAvailabilityStatus = (available?: boolean, available_from?: string) => {
   if (available === undefined) return null;
-  
+
   if (available) {
     return {
       text: 'Available',
@@ -30,7 +31,7 @@ const getAvailabilityStatus = (available?: boolean, available_from?: string) => 
     const fromText = fromDate ? ` from ${fromDate.toLocaleDateString()}` : '';
     return {
       text: `Not available${fromText}`,
-      color: 'text-red-600', 
+      color: 'text-red-600',
       icon: XCircle,
       bgColor: 'bg-red-50'
     };
@@ -52,6 +53,7 @@ interface FavoriteProfessional {
   distance?: number | null;
   available?: boolean;
   available_from?: string;
+  profile_image?: string | null;
 }
 
 interface ProfessionalCardProps {
@@ -63,31 +65,45 @@ interface ProfessionalCardProps {
 
 const ProfessionalCard = ({ professional, isFavorite, onToggleFavorite, onCardClick }: ProfessionalCardProps) => {
   const availabilityStatus = getAvailabilityStatus(professional.available, professional.available_from);
-  
+  const surname = professional.full_name.split(' ').at(-1) || professional.full_name;
+
   return (
     <Card className="p-4 cursor-pointer hover:shadow-md transition-shadow" onClick={() => onCardClick(professional.id)}>
       <div className="flex justify-between items-start mb-3">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-lg">{professional.full_name}</h3>
-            {professional.distance !== null && professional.distance !== undefined && (
-              <div className="flex items-center gap-1 text-sm text-gray-600">
-                <MapPin className="h-3 w-3" />
-                <span>{formatDistance(professional.distance)}</span>
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={professional.profile_image || undefined} />
+              <AvatarFallback className="bg-spective-accent text-white">
+                {surname.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <div className="flex items-start gap-0 flex-col px-2">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">{professional.full_name}</h3>
+                  {professional.distance !== null && professional.distance !== undefined && (
+                    <div className="flex items-center gap-1 text-sm text-gray-600">
+                      <MapPin className="h-3 w-3" />
+                      <span>{formatDistance(professional.distance)}</span>
+                    </div>
+                  )}
+                </div>
+                {availabilityStatus && (
+                  <div className={`inline-flex items-center gap-1 py-1 rounded-full text-xs font-medium ${availabilityStatus.bgColor} ${availabilityStatus.color}`}>
+                    <availabilityStatus.icon className="h-3 w-3" />
+                    <span>{availabilityStatus.text}</span>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
           {professional.daily_wage_net ? (
             <p className="text-sm text-gray-600">
               Daily Rate: ${professional.daily_wage_net}
             </p>
           ) : null}
-          {availabilityStatus && (
-            <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${availabilityStatus.bgColor} ${availabilityStatus.color}`}>
-              <availabilityStatus.icon className="h-3 w-3" />
-              <span>{availabilityStatus.text}</span>
-            </div>
-          )}
+
         </div>
         <Button
           variant="ghost"
@@ -171,7 +187,7 @@ export const CompanyDashboard = () => {
   const checkAuthorization = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         toast({
           title: "Authentication Required",
@@ -183,7 +199,7 @@ export const CompanyDashboard = () => {
       }
 
       const companyStatus = await isApprovedCompanyUser(user.id);
-      
+
       if (!companyStatus.isCompany) {
         toast({
           title: "Access Denied",
@@ -200,7 +216,7 @@ export const CompanyDashboard = () => {
           'rejected': 'Your company account has been rejected. Please contact support if you believe this is an error.',
           'error': 'There was an error checking your account status. Please try again later.'
         };
-        
+
         toast({
           title: "Access Denied",
           description: statusMessages[companyStatus.status as keyof typeof statusMessages] || statusMessages.error,
@@ -227,7 +243,7 @@ export const CompanyDashboard = () => {
 
   const fetchCompanyAddress = async () => {
     if (!currentUser?.id) return;
-    
+
     try {
       // Try to fetch address, but handle gracefully if column doesn't exist yet
       const { data: companyProfile, error } = await supabase
@@ -251,41 +267,10 @@ export const CompanyDashboard = () => {
       const { data, error } = await supabase.rpc('get_professionals_for_public');
 
       if (error) {
-        // Fallback to mock data if database query fails
-        const mockProfessionals = [
-          {
-            id: '1',
-            full_name: 'John Doe',
-            email: 'contact@company.com',
-            phone: 'Contact admin for details',
-            city: 'Budapest', // Add city for testing
-            daily_wage_net: 250,
-            skills: ['JavaScript', 'React', 'Node.js'],
-            technologies: ['MongoDB', 'Express', 'Docker'],
-            languages: ['English', 'Spanish'],
-            work_experience: '5+ years in web development',
-            available: true,
-            available_from: null,
-          },
-          {
-            id: '2',
-            full_name: 'Jane Smith',
-            email: 'contact@company.com',
-            phone: 'Contact admin for details',
-            city: 'Debrecen', // Add city for testing
-            daily_wage_net: 300,
-            skills: ['Python', 'Django', 'PostgreSQL'],
-            technologies: ['AWS', 'Kubernetes', 'Redis'],
-            languages: ['English', 'French'],
-            work_experience: '7+ years in backend development',
-            available: false,
-            available_from: '2025-09-01',
-          }
-        ];
-        setProfessionals(mockProfessionals);
+        setProfessionals([]);
         return;
       }
-
+      console.log(data);
       // Transform the data from the database function to match our interface
       const transformedProfessionals = (data || []).map((item: any) => ({
         id: item.user_id, // Use user_id as the id for favorites matching
@@ -300,6 +285,7 @@ export const CompanyDashboard = () => {
         work_experience: item.work_experience,
         available: item.available,
         available_from: item.availableFrom || item.available_from,
+        profile_image: item.profile_image_src || null,
       }));
 
       setProfessionals(transformedProfessionals);
@@ -323,7 +309,7 @@ export const CompanyDashboard = () => {
       console.log('Calculating distances using batch method for company dashboard...');
       const professionalCities = professionalsData.map(p => p.city).filter(Boolean);
       const distances = await batchCalculateDistances(companyAddress, professionalCities);
-      
+
       const professionalsWithDistance = professionalsData.map((professional, originalIndex) => {
         if (!professional.city) {
           return { ...professional, distance: null };
@@ -351,7 +337,7 @@ export const CompanyDashboard = () => {
   }, [companyAddress, professionals]);
 
   // Create favorites list from professionals that are marked as favorites
-  const favorites = professionals.filter(professional => 
+  const favorites = professionals.filter(professional =>
     favoriteIds.includes(professional.id)
   );
 
@@ -375,8 +361,8 @@ export const CompanyDashboard = () => {
             <h1 className="text-3xl font-bold mb-2">Company Dashboard</h1>
             <p className="text-gray-600">Manage your favorite professionals and access shared documents</p>
           </div>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => setIsEditModalOpen(true)}
             className="flex items-center gap-2"
           >
@@ -405,7 +391,7 @@ export const CompanyDashboard = () => {
                   Professionals you've marked as favorites. Contact our admin team to get in touch.
                 </p>
               </div>
-              
+
               {favorites.length === 0 ? (
                 <Card className="p-8 text-center">
                   <Heart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
@@ -414,9 +400,9 @@ export const CompanyDashboard = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {favorites.map(professional => (
-                    <ProfessionalCard 
-                      key={professional.id} 
-                      professional={professional} 
+                    <ProfessionalCard
+                      key={professional.id}
+                      professional={professional}
                       isFavorite={true}
                       onToggleFavorite={toggleFavorite}
                       onCardClick={handleProfessionalClick}
@@ -433,7 +419,7 @@ export const CompanyDashboard = () => {
         </Tabs>
 
         {/* Edit Profile Modal */}
-        <EditCompanyProfileModal 
+        <EditCompanyProfileModal
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           userId={currentUser?.id || ''}
