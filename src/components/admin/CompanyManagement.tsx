@@ -245,7 +245,7 @@ export const CompanyManagement = () => {
 
       if (!confirmed) return;
 
-      const result = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/delete-user`, {
+      const result = await fetch(`${import.meta.env.VITE_API_URL_ || ''}/api/delete-user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

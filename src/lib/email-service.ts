@@ -72,7 +72,7 @@ export class EmailService {
       };
 
       // Call server-side API endpoint - use relative path in production
-      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const apiUrl = import.meta.env.VITE_API_URL_ || '';
       const endpoint = apiUrl ? `${apiUrl}/api/send-email` : '/api/send-email';
       
       const headers = {
@@ -114,7 +114,7 @@ export class EmailService {
 
   async cancelEmail(emailId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const apiUrl = import.meta.env.VITE_API_URL_ || '';
       const endpoint = apiUrl ? `${apiUrl}/api/cancel-email` : '/api/cancel-email';
 
       const response = await fetch(endpoint, {
@@ -223,7 +223,7 @@ export class EmailService {
   async testConnection(): Promise<{ success: boolean; error?: string }> {
     try {
       // Test API endpoint connectivity - use relative path in production
-      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const apiUrl = import.meta.env.VITE_API_URL_ || '';
       const endpoint = apiUrl ? `${apiUrl}/api/email-status` : '/api/email-status';
       
       const headers = {

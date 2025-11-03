@@ -97,9 +97,8 @@ class CloudinaryService {
       }
 
       // Call API endpoint
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const endpoint = `/api/cloudinary/upload`;
-      //const endpoint = `${apiUrl}/api/cloudinary/upload`;
+      const apiUrl = import.meta.env.VITE_API_URL_ || '';
+      const endpoint = apiUrl ? `${apiUrl}/api/cloudinary/upload` : '/api/cloudinary/upload';
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -183,7 +182,7 @@ class CloudinaryService {
       }
 
       // Call API endpoint
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const apiUrl = import.meta.env.VITE_API_URL_ || 'http://localhost:3001';
       const endpoint = `${apiUrl}/api/cloudinary/delete`;
 
       const response = await fetch(endpoint, {
