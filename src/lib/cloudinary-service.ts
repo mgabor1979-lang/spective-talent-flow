@@ -182,7 +182,7 @@ class CloudinaryService {
       }
 
       // Call API endpoint
-      const apiUrl = import.meta.env.VITE_API_URL_ || 'http://localhost:3001';
+      const apiUrl = import.meta.env.VITE_API_URL_ || '';
       const endpoint = `${apiUrl}/api/cloudinary/delete`;
 
       const response = await fetch(endpoint, {
