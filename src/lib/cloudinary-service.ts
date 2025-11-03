@@ -97,8 +97,8 @@ class CloudinaryService {
       }
 
       // Call API endpoint
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      const endpoint = `https://spective.hu:3001/api/cloudinary/upload`;
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const endpoint = `/api/cloudinary/upload`;
       //const endpoint = `${apiUrl}/api/cloudinary/upload`;
 
       const response = await fetch(endpoint, {
