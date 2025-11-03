@@ -11,10 +11,15 @@ interface CVDocumentProps {
     wageOverride: boolean;
     customDailyWage: string;
     logo: string | null;
+    showProfileImage: boolean;
   };
+  profileImage?: {
+    src: string;
+    cloudinaryPublicId: string | null;
+  } | null;
 }
 
-export const CVDocument = ({ profileData, parsedData, options }: CVDocumentProps) => {
+export const CVDocument = ({ profileData, parsedData, options, profileImage }: CVDocumentProps) => {
   const { skills, languages, technologies, experienceSummary, workExperiences, educations } = parsedData;
 
   const formatPhone = (phone: string): string => {
@@ -64,48 +69,61 @@ export const CVDocument = ({ profileData, parsedData, options }: CVDocumentProps
     <div className="max-w-4xl mx-auto bg-white text-black" style={{ fontFamily: 'Arial, sans-serif', fontSize: '12px', lineHeight: '1.4' }}>
       {/* Header Section */}
       <div className="flex items-start justify-between mb-8 pb-6 border-b-2 border-gray-300">
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: '#2563eb' }}>
-            {displayName}
-          </h1>
+        <div className="flex items-start space-x-6">
+          {/* Profile Image */}
+          {options.showProfileImage && profileImage && (
+            <div className="flex-shrink-0">
+              <img 
+                src={profileImage.src} 
+                alt="Profile" 
+                className="w-24 h-24 rounded-lg object-cover border-2 border-gray-300"
+              />
+            </div>
+          )}
           
-          <div className="space-y-2 text-sm">
-            {profileData.email && (
-              <div className="flex items-center space-x-2">
-                <span className="font-semibold">Email:</span>
-                <span>{formatEmail(profileData.email)}</span>
-              </div>
-            )}
-            {profileData.phone && (
-              <div className="flex items-center space-x-2">
-                <span className="font-semibold">Phone:</span>
-                <span>{formatPhone(profileData.phone)}</span>
-              </div>
-            )}
-            {profileData.professional_profile?.city && (
-              <div className="flex items-center space-x-2">
-                <span className="font-semibold">Location:</span>
-                <span>{profileData.professional_profile.city}</span>
-              </div>
-            )}
-            {profileData.age && (
-              <div className="flex items-center space-x-2">
-                <span className="font-semibold">Age:</span>
-                <span>{profileData.age} years old</span>
-              </div>
-            )}
-            {profileData.professional_profile?.daily_wage_net && (
-              <div className="flex items-center space-x-2">
-                <span className="font-semibold">Daily Rate:</span>
-                <span>{formatWage(profileData.professional_profile.daily_wage_net)}</span>
-              </div>
-            )}
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold mb-2" style={{ color: '#2563eb' }}>
+              {displayName}
+            </h1>
+            
+            <div className="space-y-2 text-sm">
+              {profileData.email && (
+                <div className="flex items-center space-x-2">
+                  <span className="font-semibold">Email:</span>
+                  <span>{formatEmail(profileData.email)}</span>
+                </div>
+              )}
+              {profileData.phone && (
+                <div className="flex items-center space-x-2">
+                  <span className="font-semibold">Phone:</span>
+                  <span>{formatPhone(profileData.phone)}</span>
+                </div>
+              )}
+              {profileData.professional_profile?.city && (
+                <div className="flex items-center space-x-2">
+                  <span className="font-semibold">Location:</span>
+                  <span>{profileData.professional_profile.city}</span>
+                </div>
+              )}
+              {profileData.age && (
+                <div className="flex items-center space-x-2">
+                  <span className="font-semibold">Age:</span>
+                  <span>{profileData.age} years old</span>
+                </div>
+              )}
+              {profileData.professional_profile?.daily_wage_net && (
+                <div className="flex items-center space-x-2">
+                  <span className="font-semibold">Daily Rate:</span>
+                  <span>{formatWage(profileData.professional_profile.daily_wage_net)}</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Logo */}
         {options.logo && (
-          <div className="ml-8">
+          <div className="ml-8 flex-shrink-0">
             <img 
               src={options.logo} 
               alt="Company Logo" 

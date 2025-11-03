@@ -1112,6 +1112,7 @@ export const Profile = () => {
           onClose={() => setCvGenerationOpen(false)}
           profileData={profileData}
           parsedData={parsedData}
+          profileImage={profileImage}
         />
       )}
 

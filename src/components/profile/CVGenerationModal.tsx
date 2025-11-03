@@ -15,6 +15,10 @@ interface CVGenerationModalProps {
   onClose: () => void;
   profileData: any;
   parsedData: any;
+  profileImage?: {
+    src: string;
+    cloudinaryPublicId: string | null;
+  } | null;
 }
 
 interface CVOptions {
@@ -25,9 +29,10 @@ interface CVOptions {
   wageOverride: boolean;
   customDailyWage: string;
   logo: string | null;
+  showProfileImage: boolean;
 }
 
-export const CVGenerationModal = ({ isOpen, onClose, profileData, parsedData }: CVGenerationModalProps) => {
+export const CVGenerationModal = ({ isOpen, onClose, profileData, parsedData, profileImage }: CVGenerationModalProps) => {
   const [cvOptions, setCvOptions] = useState<CVOptions>({
     hideName: false,
     hideEmail: false,
@@ -35,7 +40,8 @@ export const CVGenerationModal = ({ isOpen, onClose, profileData, parsedData }: 
     hideWage: false,
     wageOverride: false,
     customDailyWage: '',
-    logo: null
+    logo: null,
+    showProfileImage: !!profileImage
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -78,6 +84,7 @@ export const CVGenerationModal = ({ isOpen, onClose, profileData, parsedData }: 
         profileData={profileData}
         parsedData={parsedData}
         options={cvOptions}
+        profileImage={profileImage}
       />;
 
       // Generate the PDF blob
@@ -203,6 +210,15 @@ export const CVGenerationModal = ({ isOpen, onClose, profileData, parsedData }: 
                       />
                       <Label htmlFor="wageOverride">Wage Override</Label>
                     </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="showProfileImage"
+                        checked={cvOptions.showProfileImage}
+                        onCheckedChange={(checked) => handleCheckboxChange('showProfileImage', checked as boolean)}
+                        disabled={!profileImage}
+                      />
+                      <Label htmlFor="showProfileImage">Show Profile Image {!profileImage && '(No image available)'}</Label>
+                    </div>
                   </div>
                   {cvOptions.wageOverride && (
                     <div className="mt-4">
@@ -258,6 +274,7 @@ export const CVGenerationModal = ({ isOpen, onClose, profileData, parsedData }: 
                   profileData={profileData}
                   parsedData={parsedData}
                   options={cvOptions}
+                  profileImage={profileImage}
                 />
               </div>
             </div>

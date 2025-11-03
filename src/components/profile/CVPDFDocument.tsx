@@ -51,6 +51,18 @@ const styles = StyleSheet.create({
         marginBottom: 32, // mb-8
         paddingBottom: 12, // pb-6
     },
+    headerContent: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        flex: 1,
+        gap: 16, // space-x-6
+    },
+    profileImage: {
+        width: 64, // w-24
+        height: 64, // h-24
+        borderRadius: 8, // rounded-lg
+        objectFit: 'cover',
+    },
     headerLeft: {
         flex: 1,
         maxWidth: '65%', // flex-grow
@@ -330,10 +342,15 @@ interface CVPDFDocumentProps {
         wageOverride: boolean;
         customDailyWage: string;
         logo: string | null;
+        showProfileImage: boolean;
     };
+    profileImage?: {
+        src: string;
+        cloudinaryPublicId: string | null;
+    } | null;
 }
 
-export const CVPDFDocument = ({ profileData, parsedData, options }: CVPDFDocumentProps) => {
+export const CVPDFDocument = ({ profileData, parsedData, options, profileImage }: CVPDFDocumentProps) => {
     const { skills, languages, technologies, experienceSummary, workExperiences, educations } = parsedData;
 
     const formatPhone = (phone: string): string => {
@@ -388,45 +405,52 @@ export const CVPDFDocument = ({ profileData, parsedData, options }: CVPDFDocumen
             <Page size="A4" style={styles.page}>
                 {/* Header Section */}
                 <View style={styles.header}>
-                    <View style={styles.headerLeft}>
-                        <Text style={styles.name}>{displayName}</Text>
+                    <View style={styles.headerContent}>
+                        {/* Profile Image */}
+                        {options.showProfileImage && profileImage && (
+                            <Image src={profileImage.src} style={styles.profileImage} />
+                        )}
+                        
+                        <View style={styles.headerLeft}>
+                            <Text style={styles.name}>{displayName}</Text>
 
-                        <View style={styles.contactInfoContainer}>
-                            <View style={styles.contactInfoRow}>
+                            <View style={styles.contactInfoContainer}>
+                                <View style={styles.contactInfoRow}>
 
-                                {profileData.email && (
-                                    <View>
-                                        <Text style={styles.contactLabel}>Email:</Text>
-                                        <Text>{formatEmail(profileData.email)}</Text>
-                                    </View>
-                                )}
-                                {profileData.phone && (
-                                    <View>
-                                        <Text style={styles.contactLabel}>Phone:</Text>
-                                        <Text>{formatPhone(profileData.phone)}</Text>
-                                    </View>
-                                )}
-                            </View>
-                            <View style={styles.contactInfoRow}>
-                                {profileData.professional_profile?.city && (
-                                    <View>
-                                        <Text style={styles.contactLabel}>Location:</Text>
-                                        <Text>{profileData.professional_profile.city}</Text>
-                                    </View>
-                                )}
-                                {profileData.age && (
-                                    <View>
-                                        <Text style={styles.contactLabel}>Age:</Text>
-                                        <Text>{profileData.age} years old</Text>
-                                    </View>
-                                )}
+                                    {profileData.email && (
+                                        <View>
+                                            <Text style={styles.contactLabel}>Email:</Text>
+                                            <Text>{formatEmail(profileData.email)}</Text>
+                                        </View>
+                                    )}
+                                    {profileData.phone && (
+                                        <View>
+                                            <Text style={styles.contactLabel}>Phone:</Text>
+                                            <Text>{formatPhone(profileData.phone)}</Text>
+                                        </View>
+                                    )}
+                                </View>
+                                <View style={styles.contactInfoRow}>
+                                    {profileData.professional_profile?.city && (
+                                        <View>
+                                            <Text style={styles.contactLabel}>Location:</Text>
+                                            <Text>{profileData.professional_profile.city}</Text>
+                                        </View>
+                                    )}
+                                    {profileData.age && (
+                                        <View>
+                                            <Text style={styles.contactLabel}>Age:</Text>
+                                            <Text>{profileData.age} years old</Text>
+                                        </View>
+                                    )}
 
-                                {profileData.professional_profile?.daily_wage_net && (
-                                    <View>
-                                        <Text style={styles.contactLabel}>Daily Rate:</Text>
-                                        <Text>{formatWage(profileData.professional_profile.daily_wage_net)}</Text>
-                                    </View>
-                                )}
+                                    {profileData.professional_profile?.daily_wage_net && (
+                                        <View>
+                                            <Text style={styles.contactLabel}>Daily Rate:</Text>
+                                            <Text>{formatWage(profileData.professional_profile.daily_wage_net)}</Text>
+                                        </View>
+                                    )}
+                                </View>
                             </View>
                         </View>
                     </View>
