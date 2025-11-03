@@ -35,7 +35,7 @@ export const useEmailServiceStatus = () => {
     
     try {
       // Call server-side status endpoint - use relative path in production
-      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const apiUrl = import.meta.env.VITE_API_URL_ || '';
       const endpoint = apiUrl ? `${apiUrl}/api/email-status` : '/api/email-status';
       
       const headers = {
