@@ -671,7 +671,7 @@ export const Profile = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
               <div className="relative">
-                <Avatar className="h-24 w-24">
+                <Avatar className="h-24 w-24 border-4 border-white shadow-lg ring-2 ring-white/50">
                   <AvatarImage src={profileImage?.src || "/images/maleavatar.png"} />
                   <AvatarFallback className="text-2xl font-bold">
                     {displayNameForAvatar}
