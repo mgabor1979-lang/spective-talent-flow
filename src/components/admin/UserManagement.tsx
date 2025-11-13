@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SearchBar, SearchGroup } from '@/components/ui/SearchBar';
+import { GoToTop } from '@/components/ui/GoToTop';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEmail } from '@/hooks/use-email';
@@ -625,6 +626,7 @@ export const UserManagement = () => {
   return (
     <TooltipProvider>
       <div className="space-y-6">
+        <GoToTop />
         <Card>
           <CardHeader>
             <CardTitle>User Management</CardTitle>

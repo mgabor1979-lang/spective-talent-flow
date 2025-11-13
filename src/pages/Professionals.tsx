@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { SearchBar, SearchGroup } from '@/components/ui/SearchBar';
+import { GoToTop } from '@/components/ui/GoToTop';
 import { User, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
@@ -320,6 +321,7 @@ export const Professionals = () => {
 
   return (
     <Layout>
+      <GoToTop />
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-spective-dark to-spective-gray text-primary-foreground h-[30vh] flex items-center justify-center">
         <div className="container mx-auto px-6 text-center">

@@ -5,6 +5,7 @@ import { Layout } from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { GoToTop } from '@/components/ui/GoToTop';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
@@ -665,6 +666,7 @@ export const Profile = () => {
 
   return (
     <Layout>
+      <GoToTop />
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-primary/10 to-primary/5 py-20">
         <div className="container mx-auto px-6">
