@@ -149,6 +149,17 @@ export const SearchBar = ({
 
   const totalBadgeCount = searchGroups.reduce((sum, group) => sum + group.badges.length, 0);
 
+  // Helper function to get placeholder text based on state
+  const getPlaceholderText = (groupId: string, groupBadgeCount: number): string => {
+    if (groupBadgeCount === 0) {
+      return placeholder;
+    }
+    if (localInputValues[groupId]?.trim()) {
+      return "Press Enter to add OR...";
+    }
+    return "Add another term to OR...";
+  };
+
   return (
     <div className={`bg-card rounded-lg shadow-sm p-6 ${className}`}>
       <div className="flex items-center justify-between mb-4">
@@ -208,7 +219,7 @@ export const SearchBar = ({
                     ))}
                     <input
                       type="text"
-                      placeholder={group.badges.length === 0 ? placeholder : ""}
+                      placeholder={getPlaceholderText(group.id, group.badges.length)}
                       value={localInputValues[group.id] || ''}
                       onChange={(e) => handleInputChange(group.id, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(group.id, e)}
