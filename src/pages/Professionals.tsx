@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { SearchBar } from '@/components/ui/SearchBar';
+import { SearchBar, SearchGroup } from '@/components/ui/SearchBar';
 import { User, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
@@ -149,7 +149,9 @@ const getSurname = (fullName: string): string => {
 
 export const Professionals = () => {
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchGroups, setSearchGroups] = useState<SearchGroup[]>([
+    { id: 'group-1', badges: [], inputValue: '' }
+  ]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCompany, setIsCompany] = useState(false);
@@ -243,7 +245,7 @@ export const Professionals = () => {
       { name: 'technologies', weight: 2 },     // Medium priority - technologies  
       { name: 'languages', weight: 1.5 },     // Lower priority - languages
     ],
-    threshold: 0.3, // Good balance between accuracy and fuzziness
+    threshold: 0.15, // Stricter threshold for more accurate results (was 0.3)
     distance: 100,
     includeScore: true,
     ignoreLocation: true,
@@ -267,13 +269,61 @@ export const Professionals = () => {
   }, [professionals]);
 
   const filteredProfessionals = useMemo(() => {
-    if (!searchQuery.trim()) {
+    // If no search groups have any badges, return all professionals
+    const hasAnySearchTerms = searchGroups.some(group => group.badges.length > 0);
+    console.log('Search groups:', searchGroups);
+    console.log('Has any search terms:', hasAnySearchTerms);
+    
+    if (!hasAnySearchTerms) {
+      console.log('No search terms, returning all professionals');
       return professionals;
     }
 
-    const results = fuse.search(searchQuery);
-    return results.filter(result => result.score !== undefined && result.score <= 0.3).map(result => result.item);
-  }, [professionals, searchQuery, fuse]);
+    // Helper function to check if a professional matches a badge
+    const professionalMatchesBadge = (professional: Professional, badge: string): boolean => {
+      const results = fuse.search(badge);
+      console.log(`Searching for "${badge}":`, results.length, 'results');
+      
+      // Log details of search results
+      results.forEach((result, idx) => {
+        if (idx < 5) { // Only log first 5 to avoid clutter
+          console.log(`  Result ${idx + 1}: ${result.item.full_name}, score: ${result.score}`);
+        }
+      });
+      
+      const matches = results.some(result => 
+        result.item.id === professional.id && 
+        result.score !== undefined && 
+        result.score <= 0.15 // Stricter threshold (was 0.3)
+      );
+      
+      if (matches) {
+        console.log(`  ✓ Professional "${professional.full_name}" matches badge "${badge}"`);
+      }
+      
+      return matches;
+    };
+
+    // Helper function to check if a professional matches a group (OR logic)
+    const professionalMatchesGroup = (professional: Professional, group: SearchGroup): boolean => {
+      if (group.badges.length === 0) return true;
+      const matches = group.badges.some(badge => professionalMatchesBadge(professional, badge));
+      console.log(`Professional "${professional.full_name}" matches group:`, matches);
+      return matches;
+    };
+
+    // Filter professionals based on search groups with AND/OR logic
+    const filtered = professionals.filter(professional => {
+      // Each group is ANDed together
+      const matches = searchGroups.every(group => professionalMatchesGroup(professional, group));
+      return matches;
+    });
+    
+    console.log('Filtered professionals count:', filtered.length);
+    console.log('Filtered professionals:', filtered.map(p => p.full_name));
+    
+    return filtered;
+  }, [professionals, searchGroups, fuse]);
 
   if (loading) {
     return (
@@ -303,9 +353,9 @@ export const Professionals = () => {
       <div className="container mx-auto px-6 py-12">
         {/* Search */}
         <SearchBar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          placeholder="Search by name, company, skills, experience, education, languages, technologies..."
+          searchGroups={searchGroups}
+          onSearchGroupsChange={setSearchGroups}
+          placeholder="Type and press Enter to add search terms..."
           resultsCount={filteredProfessionals.length}
           showResultsCount={true}
           className="mb-8"
@@ -357,10 +407,10 @@ export const Professionals = () => {
                         </TooltipProvider>
                       </div>
                       <p className='text-muted-foreground'>
-                        {age && <span className="text-muted-foreground">{age} years old</span>}
+                        {Boolean(age) && <span className="text-muted-foreground">{age} years old</span>}
                         {isCompany && professional.distance !== undefined && (
                           <>
-                            {age && <span className="text-muted-foreground"> • </span>}
+                            {Boolean(age) && <span className="text-muted-foreground"> • </span>}
                             <span className="text-blue-600 font-medium">
                               {formatDistance(professional.distance)} away
                             </span>
@@ -392,15 +442,15 @@ export const Professionals = () => {
         {filteredProfessionals.length === 0 && !loading && (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">
-              {searchQuery
-                ? `No professionals found matching "${searchQuery}".`
+              {searchGroups.some(group => group.badges.length > 0)
+                ? "No professionals found matching your search criteria."
                 : "No professionals found."
               }
             </p>
-            {searchQuery && (
+            {searchGroups.some(group => group.badges.length > 0) && (
               <Button
                 variant="outline"
-                onClick={() => setSearchQuery('')}
+                onClick={() => setSearchGroups([{ id: 'group-1', badges: [], inputValue: '' }])}
                 className="mt-4"
               >
                 Clear Search
