@@ -208,7 +208,6 @@ export const Professionals = () => {
 
         // Calculate distances for company users
         if (isCompany && companyAddress) {
-          console.log('Calculating distances using batch method...');
           const professionalCities = transformedData.map(p => p.city).filter(Boolean);
           const distances = await batchCalculateDistances(companyAddress, professionalCities);
           
@@ -271,35 +270,20 @@ export const Professionals = () => {
   const filteredProfessionals = useMemo(() => {
     // If no search groups have any badges, return all professionals
     const hasAnySearchTerms = searchGroups.some(group => group.badges.length > 0);
-    console.log('Search groups:', searchGroups);
-    console.log('Has any search terms:', hasAnySearchTerms);
     
     if (!hasAnySearchTerms) {
-      console.log('No search terms, returning all professionals');
       return professionals;
     }
 
     // Helper function to check if a professional matches a badge
     const professionalMatchesBadge = (professional: Professional, badge: string): boolean => {
       const results = fuse.search(badge);
-      console.log(`Searching for "${badge}":`, results.length, 'results');
-      
-      // Log details of search results
-      results.forEach((result, idx) => {
-        if (idx < 5) { // Only log first 5 to avoid clutter
-          console.log(`  Result ${idx + 1}: ${result.item.full_name}, score: ${result.score}`);
-        }
-      });
       
       const matches = results.some(result => 
         result.item.id === professional.id && 
         result.score !== undefined && 
         result.score <= 0.15 // Stricter threshold (was 0.3)
       );
-      
-      if (matches) {
-        console.log(`  ✓ Professional "${professional.full_name}" matches badge "${badge}"`);
-      }
       
       return matches;
     };
@@ -308,7 +292,6 @@ export const Professionals = () => {
     const professionalMatchesGroup = (professional: Professional, group: SearchGroup): boolean => {
       if (group.badges.length === 0) return true;
       const matches = group.badges.some(badge => professionalMatchesBadge(professional, badge));
-      console.log(`Professional "${professional.full_name}" matches group:`, matches);
       return matches;
     };
 
@@ -318,9 +301,6 @@ export const Professionals = () => {
       const matches = searchGroups.every(group => professionalMatchesGroup(professional, group));
       return matches;
     });
-    
-    console.log('Filtered professionals count:', filtered.length);
-    console.log('Filtered professionals:', filtered.map(p => p.full_name));
     
     return filtered;
   }, [professionals, searchGroups, fuse]);
@@ -359,6 +339,7 @@ export const Professionals = () => {
           resultsCount={filteredProfessionals.length}
           showResultsCount={true}
           className="mb-8"
+          storageKey="professionals-search-groups"
         />
 
         {/* Professionals Grid */}

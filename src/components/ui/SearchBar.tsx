@@ -1,4 +1,4 @@
-import { useState, KeyboardEvent } from 'react';
+import { useState, KeyboardEvent, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Search, X, Plus } from 'lucide-react';
@@ -16,6 +16,7 @@ interface SearchBarProps {
   resultsCount?: number;
   showResultsCount?: boolean;
   className?: string;
+  storageKey?: string; // Key for sessionStorage persistence
 }
 
 export const SearchBar = ({
@@ -25,8 +26,35 @@ export const SearchBar = ({
   resultsCount,
   showResultsCount = false,
   className = "",
+  storageKey,
 }: SearchBarProps) => {
   const [localInputValues, setLocalInputValues] = useState<{ [key: string]: string }>({});
+
+  // Load from sessionStorage on mount
+  useEffect(() => {
+    if (storageKey) {
+      try {
+        const stored = sessionStorage.getItem(storageKey);
+        if (stored) {
+          const parsedGroups = JSON.parse(stored) as SearchGroup[];
+          onSearchGroupsChange(parsedGroups);
+        }
+      } catch (error) {
+        console.error('Error loading search groups from sessionStorage:', error);
+      }
+    }
+  }, [storageKey]); // Only run on mount or when storageKey changes
+
+  // Save to sessionStorage whenever searchGroups change
+  useEffect(() => {
+    if (storageKey && searchGroups.length > 0) {
+      try {
+        sessionStorage.setItem(storageKey, JSON.stringify(searchGroups));
+      } catch (error) {
+        console.error('Error saving search groups to sessionStorage:', error);
+      }
+    }
+  }, [searchGroups, storageKey]);
 
   const handleInputChange = (groupId: string, value: string) => {
     setLocalInputValues(prev => ({ ...prev, [groupId]: value }));
@@ -99,12 +127,22 @@ export const SearchBar = ({
   };
 
   const clearAllGroups = () => {
-    onSearchGroupsChange([{
+    const clearedGroups = [{
       id: 'group-1',
       badges: [],
       inputValue: '',
-    }]);
+    }];
+    onSearchGroupsChange(clearedGroups);
     setLocalInputValues({});
+    
+    // Clear from sessionStorage
+    if (storageKey) {
+      try {
+        sessionStorage.removeItem(storageKey);
+      } catch (error) {
+        console.error('Error clearing search groups from sessionStorage:', error);
+      }
+    }
   };
 
   const hasAnyContent = searchGroups.some(group => group.badges.length > 0);
