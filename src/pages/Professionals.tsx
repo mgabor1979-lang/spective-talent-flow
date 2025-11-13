@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Search, User, Loader2, X } from 'lucide-react';
+import { SearchBar } from '@/components/ui/SearchBar';
+import { User, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { supabase } from '@/integrations/supabase/client';
@@ -302,38 +302,14 @@ export const Professionals = () => {
 
       <div className="container mx-auto px-6 py-12">
         {/* Search */}
-        <div className="bg-card rounded-lg shadow-sm p-6 mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Search className="h-5 w-5 text-spective-accent" />
-            <h2 className="text-lg font-semibold">Search Professionals</h2>
-          </div>
-
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search by name, company, skills, experience, education, languages, technologies..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-10"
-            />
-            {searchQuery && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-
-          {searchQuery && (
-            <p className="text-sm text-muted-foreground mt-2">
-              Found {filteredProfessionals.length} professional{filteredProfessionals.length !== 1 ? 's' : ''} matching "{searchQuery}"
-            </p>
-          )}
-        </div>
+        <SearchBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          placeholder="Search by name, company, skills, experience, education, languages, technologies..."
+          resultsCount={filteredProfessionals.length}
+          showResultsCount={true}
+          className="mb-8"
+        />
 
         {/* Professionals Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -341,7 +317,7 @@ export const Professionals = () => {
             // Use age from backend if available, otherwise calculate from birth_date
             const age = professional.age || (professional.birth_date ? calculateAge(professional.birth_date) : null);
             const experienceSummary = getExperienceSummary(professional.work_experience || '');
-            const firstName = professional.full_name; // getFirstName(professional.full_name);
+            const firstName = professional.full_name;
             const surname = getSurname(professional.full_name);
 
             return (
