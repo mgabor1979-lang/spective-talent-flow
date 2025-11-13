@@ -1,27 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SearchBar, SearchGroup } from '@/components/ui/SearchBar';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEmail } from '@/hooks/use-email';
 import { Switch } from '@/components/ui/switch';
 import {
-  Search,
   Eye,
   CheckCircle,
   XCircle,
   Ban,
   Trash2,
-  RotateCcw
+  RotateCcw,
+  X
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Fuse from 'fuse.js';
 
 // Cookie utility functions
 const setCookie = (name: string, value: string, days: number = 7) => {
@@ -57,15 +60,21 @@ interface User {
   profile_status?: string;
   is_searchable?: boolean;
   profile_image?: string | null;
+  work_experience?: string;
+  education?: string;
+  skills?: string[];
+  technologies?: string[];
+  languages?: string[];
 }
 
 type UserAction = 'approve' | 'reject' | 'ban' | 'delete' | 'reset-password';
 
 export const UserManagement = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState(getCookie('userManagement_searchTerm') || '');
+  const [searchGroups, setSearchGroups] = useState<SearchGroup[]>([
+    { id: 'group-1', badges: [], inputValue: '' }
+  ]);
   const [statusFilter, setStatusFilter] = useState(getCookie('userManagement_statusFilter') || 'all');
   const [searchableFilter, setSearchableFilter] = useState(getCookie('userManagement_searchableFilter') || 'all');
   const [roleFilter, setRoleFilter] = useState(getCookie('userManagement_roleFilter') || 'all');
@@ -73,6 +82,7 @@ export const UserManagement = () => {
   const [actionType, setActionType] = useState<UserAction | null>(null);
   const [showDialog, setShowDialog] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const { toast } = useToast();
   const { sendProfessionalApprovalEmail, sendProfessionalRejectionEmail } = useEmail();
 
@@ -82,11 +92,6 @@ export const UserManagement = () => {
   }, []);
 
   // Filter change handlers that persist to cookies
-  const handleSearchTermChange = (value: string) => {
-    setSearchTerm(value);
-    setCookie('userManagement_searchTerm', value, 7);
-  };
-
   const handleStatusFilterChange = (value: string) => {
     setStatusFilter(value);
     setCookie('userManagement_statusFilter', value, 7);
@@ -107,9 +112,96 @@ export const UserManagement = () => {
     setCurrentUserId(user?.id || null);
   };
 
-  useEffect(() => {
-    filterUsers();
-  }, [users, searchTerm, statusFilter, searchableFilter, roleFilter]);
+  // Configure Fuse.js for fuzzy search
+  const fuseOptions = {
+    keys: [
+      { name: 'full_name', weight: 5 },
+      { name: 'work_experience', weight: 3 },
+      { name: 'education', weight: 3 },
+      { name: 'skills', weight: 2.5 },
+      { name: 'technologies', weight: 2 },
+      { name: 'languages', weight: 1.5 },
+      { name: 'email', weight: 2 },
+      { name: 'phone', weight: 1 },
+    ],
+    threshold: 0.3,
+    distance: 100,
+    includeScore: true,
+    ignoreLocation: true,
+    minMatchCharLength: 2,
+    shouldSort: true,
+  };
+
+  const fuse = useMemo(() => {
+    // Prepare data for search - parse skills, technologies, languages to strings
+    const searchableData = users.map(user => ({
+      ...user,
+      work_experience: user.work_experience || '',
+      education: user.education || '',
+      skills: (user.skills || []).join(' '),
+      technologies: (user.technologies || []).join(' '),
+      languages: (user.languages || []).join(' '),
+    }));
+    return new Fuse(searchableData, fuseOptions);
+  }, [users]);
+
+  const filteredUsers = useMemo(() => {
+    let filtered = users;
+
+    // Search filter with Fuse.js
+    const hasAnySearchTerms = searchGroups.some(group => group.badges.length > 0);
+    
+    if (hasAnySearchTerms) {
+      // Helper function to check if a user matches a badge
+      const userMatchesBadge = (user: User, badge: string): boolean => {
+        const results = fuse.search(badge);
+        
+        const matches = results.some(result => 
+          result.item.id === user.id && 
+          result.score !== undefined && 
+          result.score <= 0.3
+        );
+        
+        return matches;
+      };
+
+      // Helper function to check if a user matches a group (OR logic)
+      const userMatchesGroup = (user: User, group: SearchGroup): boolean => {
+        if (group.badges.length === 0) return true;
+        return group.badges.some(badge => userMatchesBadge(user, badge));
+      };
+
+      // Filter users based on search groups with AND/OR logic
+      filtered = users.filter(user => {
+        // Each group is ANDed together
+        return searchGroups.every(group => userMatchesGroup(user, group));
+      });
+    }
+
+    // Status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(user => user.registration_status === statusFilter);
+    }
+
+    // Searchable filter
+    if (searchableFilter !== 'all') {
+      filtered = filtered.filter(user => {
+        if (searchableFilter === 'searchable') {
+          return user.is_searchable === true;
+        } else if (searchableFilter === 'not-searchable') {
+          return user.is_searchable === false;
+        }
+        return true;
+      });
+    }
+
+    // Role filter
+    if (roleFilter !== 'all') {
+      filtered = filtered.filter(user => user.role === roleFilter);
+    }
+
+    return filtered;
+  }, [users, searchGroups, statusFilter, searchableFilter, roleFilter, fuse]);
 
   const fetchUsers = async () => {
     try {
@@ -158,7 +250,12 @@ export const UserManagement = () => {
           profile_status: professionalProfile?.profile_status || 'none',
           is_searchable: professionalProfile?.is_searchable || false,
           profile_image: profileImage?.src || null,
-          phone: profile.phone
+          phone: profile.phone,
+          work_experience: professionalProfile?.work_experience || '',
+          education: professionalProfile?.education || '',
+          skills: professionalProfile?.skills || [],
+          technologies: professionalProfile?.technologies || [],
+          languages: professionalProfile?.languages || [],
         };
       }) || [];
 
@@ -173,42 +270,6 @@ export const UserManagement = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const filterUsers = () => {
-    let filtered = users;
-
-    // Search filter
-    if (searchTerm) {
-      filtered = filtered.filter(user =>
-        user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(user => user.registration_status === statusFilter);
-    }
-
-    // Searchable filter
-    if (searchableFilter !== 'all') {
-      filtered = filtered.filter(user => {
-        if (searchableFilter === 'searchable') {
-          return user.is_searchable === true;
-        } else if (searchableFilter === 'not-searchable') {
-          return user.is_searchable === false;
-        }
-        return true;
-      });
-    }
-
-    // Role filter
-    if (roleFilter !== 'all') {
-      filtered = filtered.filter(user => user.role === roleFilter);
-    }
-
-    setFilteredUsers(filtered);
   };
 
   const handleUserAction = async () => {
@@ -272,7 +333,7 @@ export const UserManagement = () => {
 
     // Send approval email
     try {
-      const loginUrl = `${window.location.origin}/`;
+      const loginUrl = `${globalThis.location.origin}/`;
       const emailResult = await sendProfessionalApprovalEmail(
         user.full_name,
         user.email,
@@ -381,7 +442,7 @@ export const UserManagement = () => {
 
   const resetUserPassword = async (user: User) => {
     await supabase.auth.resetPasswordForEmail(user.email, {
-      redirectTo: `${window.location.origin}/auth`
+      redirectTo: `${globalThis.location.origin}/auth`
     });
   };
 
@@ -572,45 +633,52 @@ export const UserManagement = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Search Bar */}
+            <SearchBar
+              searchGroups={searchGroups}
+              onSearchGroupsChange={setSearchGroups}
+              placeholder="Type and press Enter to search users..."
+              resultsCount={filteredUsers.length}
+              showResultsCount={true}
+              className="mb-6"
+              storageKey="user-management-search-groups"
+            />
+
             {/* Filters */}
-            <div className="flex gap-4 mb-6">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search users by name or email..."
-                  value={searchTerm}
-                  onChange={(e) => handleSearchTermChange(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-              <select
-                value={statusFilter}
-                onChange={(e) => handleStatusFilterChange(e.target.value)}
-                className="px-3 py-2 border rounded-md"
-              >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-              </select>
-              <select
-                value={searchableFilter}
-                onChange={(e) => handleSearchableFilterChange(e.target.value)}
-                className="px-3 py-2 border rounded-md"
-              >
-                <option value="all">All Searchable</option>
-                <option value="searchable">Searchable</option>
-                <option value="not-searchable">Not Searchable</option>
-              </select>
-              <select
-                value={roleFilter}
-                onChange={(e) => handleRoleFilterChange(e.target.value)}
-                className="px-3 py-2 border rounded-md"
-              >
-                <option value="all">All Roles</option>
-                <option value="professional">Professional</option>
-                <option value="admin">Admin</option>
-              </select>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 w-full lg:flex lg:justify-end lg:items-end">
+              <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+                <SelectTrigger className="w-full lg:w-[180px]">
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={searchableFilter} onValueChange={handleSearchableFilterChange}>
+                <SelectTrigger className="w-full lg:w-[180px]">
+                  <SelectValue placeholder="All Searchable" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Searchable</SelectItem>
+                  <SelectItem value="searchable">Searchable</SelectItem>
+                  <SelectItem value="not-searchable">Not Searchable</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={roleFilter} onValueChange={handleRoleFilterChange}>
+                <SelectTrigger className="w-full lg:w-[180px]">
+                  <SelectValue placeholder="All Roles" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Roles</SelectItem>
+                  <SelectItem value="professional">Professional</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Users Table */}
@@ -632,7 +700,10 @@ export const UserManagement = () => {
                     <TableRow key={user.id}>
                       <TableCell>
                         <div className="flex items-center space-x-3">
-                          <Avatar className="h-8 w-8">
+                          <Avatar 
+                            className="h-8 w-8 cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={() => user.profile_image && setLightboxImage(user.profile_image)}
+                          >
                             <AvatarImage src={user.profile_image || undefined} />
                             <AvatarFallback>
                               {user.full_name.split(' ')
@@ -643,7 +714,12 @@ export const UserManagement = () => {
                                 .map(n => n[0]).join('')}
                             </AvatarFallback>
                           </Avatar>
-                          <span className="font-medium">{user.full_name}</span>
+                          <Link 
+                            to={`/profile/${user.user_id}`}
+                            className="font-medium hover:underline"
+                          >
+                            {user.full_name}
+                          </Link>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -829,6 +905,26 @@ export const UserManagement = () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Image Lightbox */}
+        <Dialog open={!!lightboxImage} onOpenChange={() => setLightboxImage(null)}>
+          <DialogContent className="max-w-3xl p-0 bg-black/90 border-none [&>button]:hidden">
+            <div className="relative">
+              <Button
+                onClick={() => setLightboxImage(null)}
+                className="absolute -top-4 -right-4 h-10 w-10 rounded-full bg-white hover:bg-primary text-black hover:text-white shadow-lg z-50 p-0 transition-colors"
+                variant="ghost"
+              >
+                <X className="h-6 w-6" />
+              </Button>
+              <img 
+                src={lightboxImage || ''} 
+                alt="Profile" 
+                className="w-full h-auto max-h-[70vh] object-contain rounded-lg"
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </TooltipProvider>
   );
