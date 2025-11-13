@@ -321,10 +321,10 @@ export const Professionals = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-spective-dark to-spective-gray text-primary-foreground h-[50vh] flex items-center justify-center">
+      <section className="bg-gradient-to-r from-spective-dark to-spective-gray text-primary-foreground h-[30vh] flex items-center justify-center">
         <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Our Professionals</h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <h1 className="text-4xl md:text-4xl font-bold mb-6">Our Professionals</h1>
+          <p className="text-lg text-gray-300 max-w-2xl mx-auto">
             Discover experienced interim managers and consultants ready to drive your transformation projects
           </p>
         </div>

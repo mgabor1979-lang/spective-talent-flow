@@ -161,7 +161,7 @@ export const SearchBar = ({
   };
 
   return (
-    <div className={`bg-card rounded-lg shadow-sm p-6 ${className}`}>
+    <div className={className}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Search className="h-5 w-5 text-spective-accent" />
