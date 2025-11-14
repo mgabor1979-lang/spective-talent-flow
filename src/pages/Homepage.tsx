@@ -180,7 +180,7 @@ export const Homepage = () => {
       </section>
 
       {/* Section 4 - Project Portfolio */}
-      <section className="py-20 bg-background" id="portfolio">
+      <section className="py-20 bg-background bg-spective-light" id="portfolio">
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-bold mb-12">Our Project Portfolio</h2>
           {portfolioLoading ? (
@@ -311,7 +311,7 @@ export const Homepage = () => {
       
 
       {/* Section 11 - Join Us */}
-      <section className="py-32 bg-background">
+      <section className="py-32 bg-background bg-spective-light">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-8">Join us and find professional challenges!</h2>
           <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
