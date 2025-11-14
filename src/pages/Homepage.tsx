@@ -7,11 +7,35 @@ import { Layout } from '@/components/layout/Layout';
 import { useHomepageServices } from '@/hooks/use-homepage-services';
 import { usePortfolioItems } from '@/hooks/use-portfolio-items';
 import { ContactModal } from '@/components/ContactModal';
+import { PortfolioDetailModal } from '@/components/PortfolioDetailModal';
 
 export const Homepage = () => {
   const { services, loading: servicesLoading } = useHomepageServices();
   const { items: portfolioItems, loading: portfolioLoading } = usePortfolioItems();
   const [contactModalOpen, setContactModalOpen] = useState(false);
+  const [selectedPortfolio, setSelectedPortfolio] = useState<{ title: string; description: string } | null>(null);
+
+  // Helper function to strip HTML tags and get plain text excerpt
+  const getTextExcerpt = (html: string, maxLength: number = 2000): string => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    
+    // Add spacing after block elements before converting to text
+    const blockElements = tmp.querySelectorAll('p, div, br, h1, h2, h3, h4, h5, h6, li');
+    for (const el of blockElements) {
+      if (el.textContent) {
+        el.textContent = el.textContent + ' ';
+      }
+    }
+    
+    let text = tmp.textContent || tmp.innerText || '';
+    // Replace multiple spaces/newlines with single space and trim
+    while (text.includes('  ') || text.includes('\n') || text.includes('\r')) {
+      text = text.replace('  ', ' ').replace('\n', ' ').replace('\r', ' ');
+    }
+    text = text.trim();
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
 
   // Available icons mapping
   const iconMap = {
@@ -160,24 +184,68 @@ export const Homepage = () => {
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-bold mb-12">Our Project Portfolio</h2>
           {portfolioLoading ? (
-            <div className="space-y-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[1, 2, 3].map((item) => (
-                <div key={`loading-${item}`} className="p-4 border-l-4 border-spective-accent bg-muted rounded-r-lg animate-pulse">
-                  <div className="h-6 bg-muted-foreground/20 rounded mb-2"></div>
-                  <div className="h-4 bg-muted-foreground/20 rounded w-3/4"></div>
-                </div>
+                <Card key={`loading-${item}`} className="h-full">
+                  <CardContent className="p-6">
+                    <div className="animate-pulse space-y-3">
+                      <div className="h-6 bg-muted rounded"></div>
+                      <div className="h-20 bg-muted rounded"></div>
+                      <div className="h-10 bg-muted rounded"></div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {portfolioItems.map((item) => (
-                <div key={item.id} className="p-4 border-l-4 border-spective-accent bg-muted rounded-r-lg">
-                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                  {item.description && <p className="text-muted-foreground">{item.description}</p>}
-                </div>
+                <Card key={item.id} className="h-full hover:shadow-lg transition-shadow flex flex-col">
+                  <CardContent className="p-6 flex flex-col flex-1">
+                    <div className="flex-1 mb-4 relative overflow-hidden">
+                      <div 
+                        className="overflow-hidden"
+                        style={{ 
+                          maxHeight: '13.5rem', // ~9 lines at 1.5rem line-height
+                        }}
+                      >
+                        <h3 className="text-xl font-semibold text-spective-dark mb-3">
+                          {item.title}
+                        </h3>
+                        {item.description && (
+                          <p className="text-muted-foreground">
+                            {getTextExcerpt(item.description)}
+                          </p>
+                        )}
+                      </div>
+                      <div 
+                        className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none"
+                        style={{
+                          background: 'linear-gradient(to bottom, transparent, hsl(var(--card)) 70%)'
+                        }}
+                      ></div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="w-full border-spective-accent text-spective-accent hover:bg-spective-accent hover:text-white"
+                      onClick={() => setSelectedPortfolio({ title: item.title, description: item.description })}
+                    >
+                      Read More
+                    </Button>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}
+          <div className="text-center mt-12">
+            <Button
+              size="lg"
+              className="bg-spective-accent hover:bg-spective-accent/90"
+              onClick={() => setContactModalOpen(true)}
+            >
+              Facing similar challenges? Let's talk.
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -338,6 +406,16 @@ export const Homepage = () => {
         isOpen={contactModalOpen}
         onClose={() => setContactModalOpen(false)}
       />
+
+      {/* Portfolio Detail Modal */}
+      {selectedPortfolio && (
+        <PortfolioDetailModal
+          isOpen={!!selectedPortfolio}
+          onClose={() => setSelectedPortfolio(null)}
+          title={selectedPortfolio.title}
+          description={selectedPortfolio.description}
+        />
+      )}
     </Layout>
   );
 };

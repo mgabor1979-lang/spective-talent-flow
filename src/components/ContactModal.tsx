@@ -72,7 +72,7 @@ export const ContactModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto w-[calc(100%-2rem)] sm:w-[calc(100%-3rem)]">
         <DialogHeader>
           <DialogTitle>Contact Spective</DialogTitle>
           <DialogDescription>
