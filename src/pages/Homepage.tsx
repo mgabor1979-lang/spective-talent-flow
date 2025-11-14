@@ -277,7 +277,7 @@ export const Homepage = () => {
             <div>
               <h2 className="text-3xl font-bold mb-6">Contact Us Today</h2>
               <p className="text-lg text-muted-foreground">
-                Ready to transform your organization? Get in touch with our team to discuss how our interim management solutions can help you achieve your goals.
+                Ready to transform your organization? Get in touch with our team to discuss how our project management expertise can help you achieve your goals.
               </p>
             </div>
             <div className="text-center md:text-right">
@@ -286,32 +286,8 @@ export const Homepage = () => {
                 className="bg-spective-accent hover:bg-spective-accent/90"
                 onClick={() => setContactModalOpen(true)}
               >
-                Get Started
+                Let’s discuss your next project
               </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 7 - Our Motto */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold mb-12">Our Motto</h2>
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <p className="text-lg text-muted-foreground mb-6">
-                <strong>"We give a different perspective"</strong>, reflects our commitment to offering unique insights and strategies. We understand that every business is unique, facing distinct challenges and opportunities. That's why we tailor our guidance and support to your specific needs, helping you make informed decisions and achieve sustainable growth.
-              </p>
-              <p className="text-lg text-muted-foreground">
-                Contact us today and experience the transformative power of our expertise.
-              </p>
-            </div>
-            <div className="flex justify-center">
-              <img
-                src="/images/success.jpeg"
-                alt="Our vision"
-                className="rounded-lg w-full max-w-md"
-              />
             </div>
           </div>
         </div>
