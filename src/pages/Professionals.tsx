@@ -249,26 +249,45 @@ export const Professionals = () => {
       { name: 'technologies', weight: 2 },     // Medium priority - technologies  
       { name: 'languages', weight: 1.5 },     // Lower priority - languages
     ],
-    threshold: 0.15, // Stricter threshold for more accurate results (was 0.3)
+    threshold: 0.3, 
     distance: 100,
     includeScore: true,
     ignoreLocation: true,
     minMatchCharLength: 2,
     shouldSort: true,
+    useExtendedSearch: true, // Enable extended search for better matching
   };
 
   const fuse = useMemo(() => {
     // Prepare data for search - include names and extract company names from work experience
-    const searchableData = professionals.map(professional => ({
-      ...professional,
-      work_experience: getExperienceSummary(professional.work_experience || '') + ' ' +
-        extractCompanyNames(professional.work_experience || ''),
-      education: professional.education || '',
-      skills: parseSkills(professional.skills || []).join(' '),
-      languages: parseLanguages(professional.languages || []).join(' '),
-      technologies: (professional.technologies || []).join(' '),
-      full_name: professional.full_name, // Include names for search
-    }));
+    const searchableData = professionals.map(professional => {
+      const workExpSummary = getExperienceSummary(professional.work_experience || '');
+      const companyNames = extractCompanyNames(professional.work_experience || '');
+      const combinedWorkExp = workExpSummary + ' ' + companyNames;
+      
+      // Focus logging on specific professionals
+      if (professional.full_name.includes('Taliga') || professional.full_name.includes('Pál')) {
+        console.log('=== FOCUS: Professional Search Data ===');
+        console.log('Name:', professional.full_name);
+        console.log('Raw Work Experience:', professional.work_experience);
+        console.log('Work Experience Summary:', workExpSummary);
+        console.log('Extracted Company Names:', companyNames);
+        console.log('Combined Work Experience:', combinedWorkExp);
+        console.log('Raw Skills:', professional.skills);
+        console.log('Parsed Skills:', parseSkills(professional.skills || []));
+        console.log('=======================================');
+      }
+      
+      return {
+        ...professional,
+        work_experience: combinedWorkExp,
+        education: professional.education || '',
+        skills: parseSkills(professional.skills || []).join(' '),
+        languages: parseLanguages(professional.languages || []).join(' '),
+        technologies: (professional.technologies || []).join(' '),
+        full_name: professional.full_name, // Include names for search
+      };
+    });
     return new Fuse(searchableData, fuseOptions);
   }, [professionals]);
 
@@ -285,11 +304,43 @@ export const Professionals = () => {
       const professionalMatchesBadge = (professional: Professional, badge: string): boolean => {
         const results = fuse.search(badge);
 
+        // Focus on specific professionals
+        const isFocusProfessional = professional.full_name.includes('Taliga') || professional.full_name.includes('Pál');
+        
+        if (isFocusProfessional) {
+          console.log(`\n=== FOCUS: Search Results for "${badge}" - ${professional.full_name} ===`);
+          console.log('Total search results:', results.length);
+          
+          // Show all results
+          for (const [idx, result] of results.entries()) {
+            console.log(`Result ${idx + 1}:`, {
+              name: result.item.full_name,
+              score: result.score,
+              matchesThreshold: result.score !== undefined && result.score <= 0.4,
+              id: result.item.id,
+            });
+          }
+          
+          // Check if this professional is in the results
+          const thisResult = results.find(r => r.item.id === professional.id);
+          if (thisResult) {
+            console.log(`✓ ${professional.full_name} FOUND in results with score: ${thisResult.score}`);
+            console.log(`  Passes threshold (≤0.4)? ${thisResult.score !== undefined && thisResult.score <= 0.4 ? 'YES' : 'NO'}`);
+          } else {
+            console.log(`✗ ${professional.full_name} NOT FOUND in search results`);
+          }
+          console.log('=====================================================\n');
+        }
+
         const matches = results.some(result =>
           result.item.id === professional.id &&
           result.score !== undefined &&
-          result.score <= 0.15 // Stricter threshold (was 0.3)
+          result.score <= 0.4 // More relaxed threshold for fuzzy matching
         );
+
+        if (isFocusProfessional) {
+          console.log(`FINAL: ${professional.full_name} matches "${badge}": ${matches}`);
+        }
 
         return matches;
       };
