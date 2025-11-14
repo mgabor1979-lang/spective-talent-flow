@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Edit, Heart, CheckCircle, XCircle, FileText } from 'lucide-react';
+import { Edit, Heart, CheckCircle, XCircle, FileText, X } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { GoToTop } from '@/components/ui/GoToTop';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
@@ -291,6 +292,7 @@ export const Profile = () => {
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [cvGenerationOpen, setCvGenerationOpen] = useState(false);
   const [imageCropModalOpen, setImageCropModalOpen] = useState(false);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   // Memoized parsed data to prevent unnecessary re-renders and maintain stable references
   const parsedData = useMemo(() => {
@@ -697,7 +699,12 @@ export const Profile = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
               <div className="relative">
-                <Avatar className="h-24 w-24 border-4 border-white shadow-lg ring-2 ring-white/50">
+                <Avatar 
+                  className={`h-24 w-24 border-4 border-white shadow-lg ring-2 ring-white/50 ${
+                    profileImage?.src ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''
+                  }`}
+                  onClick={() => profileImage?.src && setLightboxImage(profileImage.src)}
+                >
                   <AvatarImage src={profileImage?.src || "/images/maleavatar.png"} />
                   <AvatarFallback className="text-2xl font-bold">
                     {displayNameForAvatar}
@@ -1152,6 +1159,26 @@ export const Profile = () => {
           onSave={handleSaveImage}
         />
       )}
+
+      {/* Image Lightbox */}
+      <Dialog open={!!lightboxImage} onOpenChange={() => setLightboxImage(null)}>
+        <DialogContent className="max-w-3xl p-0 bg-black/90 border-none [&>button]:hidden">
+          <div className="relative">
+            <Button
+              onClick={() => setLightboxImage(null)}
+              className="absolute -top-4 -right-4 h-10 w-10 rounded-full bg-white hover:bg-primary text-black hover:text-white shadow-lg z-50 p-0 transition-colors"
+              variant="ghost"
+            >
+              <X className="h-6 w-6" />
+            </Button>
+            <img 
+              src={lightboxImage || ''} 
+              alt="Profile" 
+              className="w-full h-auto max-h-[70vh] object-contain rounded-lg"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
