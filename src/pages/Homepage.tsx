@@ -254,7 +254,7 @@ export const Homepage = () => {
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-6">Our Trusted Partners</h2>
           <p className="text-lg text-muted-foreground mb-12 max-w-4xl mx-auto">
-            We are proud to support leading companies in the automotive and manufacturing industries by providing project management expertise that drives operational excellence, ensures project success, and contributes to long-term business sustainability.
+            We are proud to support leading companies in the automotive and manufacturing industries.
           </p>
           <div className="flex flex-wrap justify-center items-center gap-12 opacity-80">
             {partners.map((partner) => (
