@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
@@ -5,10 +6,36 @@ import { ArrowRight, Target, Award, Users, Briefcase, Globe, Lightbulb, Trending
 import { Layout } from '@/components/layout/Layout';
 import { useHomepageServices } from '@/hooks/use-homepage-services';
 import { usePortfolioItems } from '@/hooks/use-portfolio-items';
+import { ContactModal } from '@/components/ContactModal';
+import { PortfolioDetailModal } from '@/components/PortfolioDetailModal';
 
 export const Homepage = () => {
   const { services, loading: servicesLoading } = useHomepageServices();
   const { items: portfolioItems, loading: portfolioLoading } = usePortfolioItems();
+  const [contactModalOpen, setContactModalOpen] = useState(false);
+  const [selectedPortfolio, setSelectedPortfolio] = useState<{ title: string; description: string } | null>(null);
+
+  // Helper function to strip HTML tags and get plain text excerpt
+  const getTextExcerpt = (html: string, maxLength: number = 2000): string => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    
+    // Add spacing after block elements before converting to text
+    const blockElements = tmp.querySelectorAll('p, div, br, h1, h2, h3, h4, h5, h6, li');
+    for (const el of blockElements) {
+      if (el.textContent) {
+        el.textContent = el.textContent + ' ';
+      }
+    }
+    
+    let text = tmp.textContent || tmp.innerText || '';
+    // Replace multiple spaces/newlines with single space and trim
+    while (text.includes('  ') || text.includes('\n') || text.includes('\r')) {
+      text = text.replace('  ', ' ').replace('\n', ' ').replace('\r', ' ');
+    }
+    text = text.trim();
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
 
   // Available icons mapping
   const iconMap = {
@@ -47,37 +74,43 @@ export const Homepage = () => {
           <div className="absolute bottom-20 right-20 w-28 h-28 bg-white rotate-45"></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-gray-200 rotate-12"></div>
         </div>
-        
+
         <div className="container mx-auto px-6 text-center relative z-10">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6">Spective</h1>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6">SPECTIVE</h1>
           <p className="text-xl md:text-2xl text-gray-300 italic">
-            Your Partner in Success through Unique Perspective
+            We deliver projects — on time, on budget, audit-ready.
           </p>
         </div>
       </section>
 
       {/* Section 1 - Introduction */}
-      <section className="py-20 bg-background">
+      <section className="py-10 bg-background">
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold mb-6">Welcome to Spective</h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Welcome to Spective, a trusted project management consulting firm dedicated to supporting automotive and manufacturing companies in achieving operational excellence.
+                Spective is a project consulting company helping organizations execute complex projects with structure, transparency, and measurable results.
               </p>
-              <p className="text-lg text-muted-foreground mb-8">
-                Our mission is to connect clients with highly skilled professionals who possess the specialized knowledge and industry expertise required to drive complex projects to success. Beyond providing expert resources, we deliver a comprehensive project management framework designed to ensure structure, transparency, and control throughout every phase of the project lifecycle.
-              </p>
-              <Button asChild size="lg" className="bg-spective-accent hover:bg-spective-accent/90">
-                <Link to="/professionals">
-                  Explore Our Professionals <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
+              <div className="flex flex-col gap-1 md:flex-row">
+                <Button asChild size="lg" variant="outline" className="mr-4">
+                  <a href="#portfolio">
+                    See our project portfolio
+                  </a>
+                </Button>
+                <Button
+                  size="lg"
+                  className="bg-spective-accent hover:bg-spective-accent/90"
+                  onClick={() => setContactModalOpen(true)}
+                >
+                  Let's discuss your next project <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
+
             </div>
             <div className="flex justify-center">
-              <img 
-                src="/images/team.jpeg" 
-                alt="Professional team" 
+              <img
+                src="/images/team.jpeg"
+                alt="Professional team"
                 className="rounded-lg w-full max-w-md"
               />
             </div>
@@ -88,7 +121,7 @@ export const Homepage = () => {
       {/* Section 2 - Our Services */}
       <section className="py-20 bg-spective-light">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">Our Services</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Project management</h2>
           {servicesLoading ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[1, 2, 3].map((item) => (
@@ -122,18 +155,24 @@ export const Homepage = () => {
       {/* Section 3 - About Us */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold mb-12">About Us</h2>
+          <h2 className="text-3xl font-bold mb-12">About Spective</h2>
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <img 
-                src="/images/us.jpeg" 
-                alt="About Spective" 
+              <img
+                src="/images/us.jpeg"
+                alt="About Spective"
                 className="rounded-lg w-full"
               />
             </div>
             <div>
               <p className="text-lg text-muted-foreground mb-6">
-                Spective was founded in 2021 with the aim of providing specialized project management consulting services to the automotive and manufacturing industries. Since our inception, we have achieved steady and sustainable growth, supported by the successful delivery of complex and high-value projects for our clients.
+                Spective is a project management consulting company specializing in industrial and manufacturing projects.
+              </p>
+              <p className="text-lg text-muted-foreground mb-6">
+                We connect clients with highly skilled professionals and provide a structured project management framework that ensures transparency, control, and professional oversight throughout the entire project lifecycle.
+              </p>
+              <p className="text-lg text-muted-foreground mb-6">
+                Our approach guarantees that every project is executed efficiently, on time, and in compliance with all quality and budget expectations.
               </p>
             </div>
           </div>
@@ -141,28 +180,72 @@ export const Homepage = () => {
       </section>
 
       {/* Section 4 - Project Portfolio */}
-      <section className="py-20 bg-background">
+      <section className="py-20 bg-background bg-spective-light" id="portfolio">
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-bold mb-12">Our Project Portfolio</h2>
           {portfolioLoading ? (
-            <div className="space-y-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[1, 2, 3].map((item) => (
-                <div key={`loading-${item}`} className="p-4 border-l-4 border-spective-accent bg-muted rounded-r-lg animate-pulse">
-                  <div className="h-6 bg-muted-foreground/20 rounded mb-2"></div>
-                  <div className="h-4 bg-muted-foreground/20 rounded w-3/4"></div>
-                </div>
+                <Card key={`loading-${item}`} className="h-full">
+                  <CardContent className="p-6">
+                    <div className="animate-pulse space-y-3">
+                      <div className="h-6 bg-muted rounded"></div>
+                      <div className="h-20 bg-muted rounded"></div>
+                      <div className="h-10 bg-muted rounded"></div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {portfolioItems.map((item) => (
-                <div key={item.id} className="p-4 border-l-4 border-spective-accent bg-muted rounded-r-lg">
-                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                  {item.description && <p className="text-muted-foreground">{item.description}</p>}
-                </div>
+                <Card key={item.id} className="h-full hover:shadow-lg transition-shadow flex flex-col">
+                  <CardContent className="p-6 flex flex-col flex-1">
+                    <div className="flex-1 mb-4 relative overflow-hidden">
+                      <div 
+                        className="overflow-hidden"
+                        style={{ 
+                          maxHeight: '13.5rem', // ~9 lines at 1.5rem line-height
+                        }}
+                      >
+                        <h3 className="text-xl font-semibold text-spective-dark mb-3">
+                          {item.title}
+                        </h3>
+                        {item.description && (
+                          <p className="text-muted-foreground">
+                            {getTextExcerpt(item.description)}
+                          </p>
+                        )}
+                      </div>
+                      <div 
+                        className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none"
+                        style={{
+                          background: 'linear-gradient(to bottom, transparent, hsl(var(--card)) 70%)'
+                        }}
+                      ></div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="w-full border-spective-accent text-spective-accent hover:bg-spective-accent hover:text-white"
+                      onClick={() => setSelectedPortfolio({ title: item.title, description: item.description })}
+                    >
+                      Read More
+                    </Button>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}
+          <div className="text-center mt-12">
+            <Button
+              size="lg"
+              className="bg-spective-accent hover:bg-spective-accent/90"
+              onClick={() => setContactModalOpen(true)}
+            >
+              Facing similar challenges? Let's talk.
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -171,14 +254,14 @@ export const Homepage = () => {
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-6">Our Trusted Partners</h2>
           <p className="text-lg text-muted-foreground mb-12 max-w-4xl mx-auto">
-            We are proud to support leading companies in the automotive and manufacturing industries by providing project management expertise that drives operational excellence, ensures project success, and contributes to long-term business sustainability.
+            We are proud to support leading companies in the automotive and manufacturing industries.
           </p>
           <div className="flex flex-wrap justify-center items-center gap-12 opacity-80">
             {partners.map((partner) => (
               <div key={partner.name} className="w-32 h-16 rounded flex items-center justify-center">
-                <img 
-                  src={partner.logo} 
-                  alt={partner.name} 
+                <img
+                  src={partner.logo}
+                  alt={partner.name}
                   className="h-10 w-auto object-contain"
                 />
               </div>
@@ -194,48 +277,28 @@ export const Homepage = () => {
             <div>
               <h2 className="text-3xl font-bold mb-6">Contact Us Today</h2>
               <p className="text-lg text-muted-foreground">
-                Ready to transform your organization? Get in touch with our team to discuss how our interim management solutions can help you achieve your goals.
+                Ready to transform your organization? Get in touch with our team to discuss how our project management expertise can help you achieve your goals.
               </p>
             </div>
             <div className="text-center md:text-right">
-              <Button size="lg" className="bg-spective-accent hover:bg-spective-accent/90">
-                <a href="#footer">Get Started</a>
+              <Button
+                size="lg"
+                className="bg-spective-accent hover:bg-spective-accent/90"
+                onClick={() => setContactModalOpen(true)}
+              >
+                Let’s discuss your next project
               </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Section 7 - Our Motto */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold mb-12">Our Motto</h2>
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <p className="text-lg text-muted-foreground mb-6">
-                <strong>"We give a different perspective"</strong>, reflects our commitment to offering unique insights and strategies. We understand that every business is unique, facing distinct challenges and opportunities. That's why we tailor our guidance and support to your specific needs, helping you make informed decisions and achieve sustainable growth.
-              </p>
-              <p className="text-lg text-muted-foreground">
-                Contact us today and experience the transformative power of our expertise.
-              </p>
-            </div>
-            <div className="flex justify-center">
-              <img 
-                src="/images/success.jpeg" 
-                alt="Our vision" 
-                className="rounded-lg w-full max-w-md"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Section 8 - Professionals CTA */}
-      <section className="py-20 bg-spective-light">
+      <section className="py-20">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-6">Our Professionals are Waiting for You</h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Discover our network of experienced interim managers, consultants, and industry experts ready to drive your next transformation project.
+            Discover our network of experienced project managers and industry experts ready to drive your next transformation project.
           </p>
           <Button asChild size="lg" className="bg-spective-accent hover:bg-spective-accent/90">
             <Link to="/professionals">
@@ -245,51 +308,10 @@ export const Homepage = () => {
         </div>
       </section>
 
-      {/* Section 9 - Partner with Spective */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold mb-12 text-center">Partner with Spective</h2>
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="mb-12">
-              <p className="text-lg text-muted-foreground mb-6">
-                and experience the transformative power of our expertise. Let us connect you with professionals who possess the knowledge and skills to drive your success.
-              </p>
-              <p className="text-lg text-muted-foreground">
-                Together, we will navigate challenges, optimize operations, and provide a fresh perspective to help you thrive in the ever-changing business landscape.
-              </p>
-            </div>
-            <div className="flex justify-center">
-              <img 
-                src="/images/partnership.jpeg" 
-                alt="Partnership" 
-                className="rounded-lg w-full max-w-md"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 10 - Final CTA */}
-      <section className="py-20 bg-spective-light">
-        <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Business?</h2>
-              <p className="text-lg text-muted-foreground">
-                Take the first step towards achieving extraordinary results. Our team is ready to discuss how we can support your transformation journey.
-              </p>
-            </div>
-            <div className="text-center md:text-right">
-              <Button size="lg" className="bg-spective-accent hover:bg-spective-accent/90">
-                <a href="#footer">Contact Us</a>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       {/* Section 11 - Join Us */}
-      <section className="py-32 bg-background">
+      <section className="py-32 bg-background bg-spective-light">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-8">Join us and find professional challenges!</h2>
           <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
@@ -309,6 +331,22 @@ export const Homepage = () => {
           </div>
         </div>
       </section>
+
+      {/* Contact Modal */}
+      <ContactModal
+        isOpen={contactModalOpen}
+        onClose={() => setContactModalOpen(false)}
+      />
+
+      {/* Portfolio Detail Modal */}
+      {selectedPortfolio && (
+        <PortfolioDetailModal
+          isOpen={!!selectedPortfolio}
+          onClose={() => setSelectedPortfolio(null)}
+          title={selectedPortfolio.title}
+          description={selectedPortfolio.description}
+        />
+      )}
     </Layout>
   );
 };

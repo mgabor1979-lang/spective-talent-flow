@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { Badge } from '@/components/ui/badge';
 import { 
   Dialog, 
@@ -111,9 +111,6 @@ function SortablePortfolioItem({
                 {item.is_active ? "Active" : "Inactive"}
               </Badge>
             </div>
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {item.description}
-            </p>
           </div>
         </div>
       </div>
@@ -424,7 +421,7 @@ export const PortfolioManagement = () => {
                   Add Portfolio Item
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>
                     {editingItem ? 'Edit Portfolio Item' : 'Add New Portfolio Item'}
@@ -447,12 +444,10 @@ export const PortfolioManagement = () => {
                   
                   <div>
                     <Label htmlFor="item-description">Description</Label>
-                    <Textarea
-                      id="item-description"
+                    <RichTextEditor
                       value={formData.description}
-                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
                       placeholder="Portfolio item description"
-                      className="min-h-[100px]"
                     />
                   </div>
                   

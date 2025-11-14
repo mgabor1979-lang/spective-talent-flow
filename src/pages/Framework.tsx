@@ -1,122 +1,109 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Target, Users, TrendingUp, Award, Clock, FileText, Shield, Settings } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { CheckCircle, Target, Users, TrendingUp, Award, Clock, FileText, Shield, Settings, ArrowRight } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
+import { ContactModal } from '@/components/ContactModal';
+import { useState } from 'react';
 
 export const Framework = () => {
-  const prince2Principles = [
+  const [contactModalOpen, setContactModalOpen] = useState(false);
+
+  const corePrinciples = [
     {
-      title: "Continued Business Justification",
-      description: "Every project must remain viable and aligned with business objectives throughout its lifecycle.",
+      title: "Business Justification",
+      description: "Every project must have a clear purpose, remain viable, and deliver measurable value throughout its lifecycle",
       icon: <Target className="h-6 w-6" />
     },
     {
-      title: "Learn from Experience",
-      description: "Lessons from previous projects are identified and applied to improve current and future project performance.",
+      title: "Defined Roles and Responsibilities",
+      description: "Each project has clearly assigned accountabilities covering business, user, and supplier perspectives",
       icon: <TrendingUp className="h-6 w-6" />
     },
     {
-      title: "Defined Roles and Responsibilities",
-      description: "Clear assignment of accountability and responsibility within the project management structure, covering business, user, and supplier interests.",
+      title: "Stage-Based Management",
+      description: "Projects are divided into manageable phases to enable effective planning, monitoring, and control.",
       icon: <Users className="h-6 w-6" />
     },
     {
-      title: "Manage by Stages",
-      description: "The project is divided into manageable stages to enable effective planning, monitoring, and control.",
+      title: "Manage by exception",
+      description: "Clear tolerances for time, cost, scope, quality, benefits, and risk are established to empower day-to-day decision-making at the appropriate levels without escalating minor issues.",
       icon: <Award className="h-6 w-6" />
     },
     {
-      title: "Manage by Exception",
-      description: "Clear tolerances for time, cost, scope, quality, benefits, and risk are established to empower day-to-day decision-making at the appropriate levels without escalating minor issues.",
+      title: "Product and Deliverable Focus",
+      description: "Project outputs are clearly defined, developed, and validated against agreed quality requirements.",
       icon: <Shield className="h-6 w-6" />
-    },
-    {
-      title: "Focus on Products",
-      description: "The project's output—its products—are clearly defined, developed, and validated to meet specified quality requirements.",
-      icon: <CheckCircle className="h-6 w-6" />
-    },
-    {
-      title: "Tailor to Suit the Project Environment",
-      description: "The PRINCE2 method is adapted to fit the project's size, complexity, risk profile, and organizational context.",
-      icon: <Settings className="h-6 w-6" />
     }
   ];
 
-  const prince2Themes = [
+  const keyManagementAreas = [
     {
-      title: "Business Case",
-      description: "Justification for the project in terms of its benefits, costs, and risks."
+      title: "Business Case & Objectives",
+      description: "Establishing clear project goals, benefits, and expected outcomes."
     },
     {
       title: "Organization",
-      description: "Definition of the project governance structure, including roles, responsibilities, and decision-making authorities."
+      description: "Defining decision-making structures, roles, and responsibilities."
     },
     {
-      title: "Quality",
-      description: "Establishment of quality criteria, assurance, and control measures to ensure deliverables meet expectations."
+      title: "Quality & Performance",
+      description: "Setting and monitoring quality standards to ensure all deliverables meet expectations."
     },
     {
-      title: "Plans",
-      description: "Development of detailed plans defining what will be delivered, when, by whom, and at what cost."
+      title: "Planning & Scheduling",
+      description: "Developing detailed, realistic plans that define what will be delivered, when, and by whom."
     },
     {
-      title: "Risk",
-      description: "Systematic identification, assessment, and control of uncertainties that may impact project objectives."
+      title: "Risk & Issue Management",
+      description: "Identifying, assessing, and mitigating risks and issues that could affect project success."
     },
     {
-      title: "Change",
-      description: "Management of project scope changes and issue resolution to protect the integrity of the project baseline."
+      title: "Change Management",
+      description: "Managing scope changes and ensuring alignment between stakeholders."
     },
     {
-      title: "Progress",
-      description: "Ongoing measurement of project performance against plans to ensure timely corrective actions."
+      title: "Progress Tracking & Reporting",
+      description: "Regularly monitoring performance against plans to ensure transparency and timely corrective actions."
     }
   ];
 
-  const prince2Processes = [
+  const projectLifecycles = [
     {
-      title: "Starting Up a Project (SU)",
-      description: "Initial project viability assessment and preparation of the project brief."
+      title: "Project Initiation",
+      description: "Defining objectives, scope, stakeholders, and feasibility."
     },
     {
-      title: "Directing a Project (DP)",
-      description: "Decision-making and control responsibilities of the Project Board across the project lifecycle."
+      title: "Planning",
+      description: "Creating detailed plans, schedules, and risk assessments."
     },
     {
-      title: "Initiating a Project (IP)",
-      description: "Development of the Project Initiation Documentation (PID), which serves as the project's foundation."
+      title: "Execution & Monitoring",
+      description: "Coordinating activities, tracking progress, and managing risks."
     },
     {
-      title: "Controlling a Stage (CS)",
-      description: "Management of day-to-day project activities and monitoring of work progress within a stage."
+      title: "Stage Review & Adjustment",
+      description: "Evaluating progress and updating plans as needed."
     },
     {
-      title: "Managing Product Delivery (MP)",
-      description: "Control of work package acceptance, execution, and delivery by the team."
-    },
-    {
-      title: "Managing a Stage Boundary (SB)",
-      description: "Planning for the next stage and evaluating the current stage's performance."
-    },
-    {
-      title: "Closing a Project (CP)",
-      description: "Formal closure of the project, confirmation of objectives met, and lessons learned documentation."
+      title: "Project Closure",
+      description: "Confirming objectives achieved, documenting results, and capturing lessons learned."
     }
   ];
 
-  const frameworkElements = [
+  const practicalToolsAndInfrastructure = [
     {
       title: "Project Documentation Templates",
-      description: "A comprehensive set of standardized forms and templates covering all critical project phases, from initiation and planning to execution and closure. These ensure clarity in scope definition, risk management, stakeholder communication, and progress tracking.",
+      description: "A comprehensive set of standardized templates covering all critical project phases — from initiation and planning to execution and closure. These templates ensure consistency in scope definition, risk management, communication, and reporting.",
       icon: <FileText className="h-6 w-6" />
     },
     {
       title: "Centralized Document Management",
-      description: "All project documentation is securely stored and managed within a Microsoft Teams environment, providing real-time access and version control for all stakeholders. This enables seamless collaboration, auditability, and traceability throughout the project lifecycle.",
+      description: "All project documentation is securely stored within Microsoft Teams, ensuring real-time access, version control, and traceability for all stakeholders.",
       icon: <Shield className="h-6 w-6" />
     },
     {
       title: "Task and Activity Management",
-      description: "Project tasks, responsibilities, and deadlines are organized and monitored using Microsoft Planner or Microsoft Project for the Web. This ensures clear task ownership, timely execution, and alignment with project milestones and deliverables.",
+      description: "We use Microsoft Planner or Microsoft Project for the Web to organize and monitor project tasks, responsibilities, and deadlines, ensuring clear ownership and timely delivery.",
       icon: <Settings className="h-6 w-6" />
     }
   ];
@@ -124,30 +111,37 @@ export const Framework = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-spective-dark to-spective-gray text-primary-foreground py-20">
+      <section className="bg-gradient-to-r from-spective-dark to-spective-gray text-primary-foreground py-10">
         <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Our Project Framework</h1>
-          <p className="text-xl text-gray-300 max-w-4xl mx-auto">
-            At Spective, we provide our consultants with a structured and standardized project 
-            management framework designed to ensure consistency, efficiency, and transparency across 
-            all client engagements. This framework integrates proven methodologies, digital tools, 
-            and best practices to support the successful execution of complex industrial projects.
-          </p>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">Framework</h1>
         </div>
-      </section>
-
-      {/* PRINCE2 Introduction */}
-      <section className="py-20 bg-background">
+      </section>      {/* PRINCE2 Introduction */}
+      <section className="py-10 bg-background">
         <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto text-center mb-16">
-            <h2 className="text-3xl font-bold mb-6">PRINCE2 Methodology</h2>
-            <p className="text-lg text-muted-foreground">
-              At Spective, we apply the PRINCE2 methodology as the foundation for our project 
-              management approach. PRINCE2 is a globally recognized, process-driven framework 
-              designed to ensure that projects are well-structured, controlled, and aligned with 
-              business objectives. Its structured design provides clarity in governance, 
-              decision-making, and accountability across all project phases.
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl font-bold mb-6">How We Ensure Project Success</h2>
+            <p className="max-w-4xl mx-auto mb-3">
+              Spective provides end-to-end project management and operational consulting for its clients.
             </p>
+            <p className="max-w-4xl mx-auto mb-3">
+              Our consultants combine hands-on industry experience with structured project management expertise to ensure stable launches, compliant systems, and measurable performance.
+            </p>
+            <p className="max-w-4xl mx-auto mb-3">
+              What makes Spective unique is that we don’t just provide experts — we provide a project management framework that supports both the consultant and the client throughout the entire engagement.
+            </p>
+            <p className="max-w-4xl mx-auto mb-3">
+              This framework ensures that every project is executed with clear structure, transparent communication, and professional oversight.
+            </p>
+            <p className="max-w-4xl mx-auto mb-8">
+              It enables consistent reporting, risk management, and alignment between all stakeholders — creating full visibility for the client and confidence in project outcomes
+            </p>
+            <Button
+              size="lg"
+              className="bg-spective-accent hover:bg-spective-accent/90"
+              onClick={() => setContactModalOpen(true)}
+            >
+              Let's discuss how we can apply this to your project <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
           </div>
         </div>
       </section>
@@ -155,14 +149,13 @@ export const Framework = () => {
       {/* PRINCE2 Principles */}
       <section className="py-20 bg-spective-light">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-6">1. PRINCE2 Principles</h2>
+          <h2 className="text-3xl font-bold text-center mb-6">1. Core Principles</h2>
           <p className="text-lg text-muted-foreground text-center mb-12 max-w-3xl mx-auto">
-            The seven core principles form the foundation of every PRINCE2 project. These universally 
-            applicable principles guide all decision-making and project behavior:
+            Our framework is guided by key principles that ensure professional execution and consistent results across all projects:
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {prince2Principles.map((principle, index) => (
-              <Card key={index} className="h-full hover:shadow-lg transition-shadow">
+            {corePrinciples.map((principle, index) => (
+              <Card key={'_' + index} className="h-full hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <div className="text-spective-accent mb-4">{principle.icon}</div>
                   <h3 className="text-lg font-semibold mb-3">{principle.title}</h3>
@@ -177,14 +170,13 @@ export const Framework = () => {
       {/* PRINCE2 Themes */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-6">2. PRINCE2 Themes</h2>
+          <h2 className="text-3xl font-bold text-center mb-6">2. Key Management Areas</h2>
           <p className="text-lg text-muted-foreground text-center mb-12 max-w-3xl mx-auto">
-            These seven themes describe critical aspects of project management that must be continually 
-            addressed throughout the project lifecycle:
+            The Spective framework addresses all critical aspects of project management that must be monitored throughout the project lifecycle:
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {prince2Themes.map((theme, index) => (
-              <Card key={index} className="h-full hover:shadow-lg transition-shadow">
+            {keyManagementAreas.map((theme, index) => (
+              <Card key={'_' + index} className="h-full hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-lg">{theme.title}</CardTitle>
                 </CardHeader>
@@ -200,14 +192,13 @@ export const Framework = () => {
       {/* PRINCE2 Processes */}
       <section className="py-20 bg-spective-light">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-6">3. PRINCE2 Processes</h2>
+          <h2 className="text-3xl font-bold text-center mb-6">3. Our Project Lifecycle Approach</h2>
           <p className="text-lg text-muted-foreground text-center mb-12 max-w-3xl mx-auto">
-            The methodology is executed through seven defined processes that guide the project from 
-            initiation to closure:
+            Our framework follows a structured lifecycle that ensures projects are consistently managed from initiation to closure:
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {prince2Processes.map((process, index) => (
-              <Card key={index} className="h-full hover:shadow-lg transition-shadow">
+            {projectLifecycles.map((process, index) => (
+              <Card key={'_' + index} className="h-full hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-lg">{process.title}</CardTitle>
                 </CardHeader>
@@ -224,19 +215,15 @@ export const Framework = () => {
       <section className="py-20 bg-background">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-6">4. Tailoring PRINCE2 to Our Environment</h2>
+            <h2 className="text-3xl font-bold text-center mb-6">4. Practical Tools and Infrastructure</h2>
             <p className="text-lg text-muted-foreground text-center mb-12">
-              At Spective, we tailor PRINCE2 principles, themes, and processes to suit the unique 
-              requirements of each client and project—considering factors such as organizational culture, 
-              project complexity, scale, and risk exposure. This ensures that the methodology remains 
-              practical, scalable, and effective in automotive and manufacturing environments.
+              We support every project with standardized tools and processes that promote efficiency and transparency:
             </p>
-            
+
             <div className="mb-12">
-              <h3 className="text-2xl font-semibold mb-8 text-center">Key elements of our framework include:</h3>
               <div className="grid md:grid-cols-1 gap-8">
-                {frameworkElements.map((element, index) => (
-                  <Card key={index} className="hover:shadow-lg transition-shadow">
+                {practicalToolsAndInfrastructure.map((element, index) => (
+                  <Card key={'_' + index} className="hover:shadow-lg transition-shadow">
                     <CardContent className="p-8">
                       <div className="flex items-start space-x-4">
                         <div className="text-spective-accent mt-1">{element.icon}</div>
@@ -250,9 +237,25 @@ export const Framework = () => {
                 ))}
               </div>
             </div>
+            
+            <div className="text-center w-full">
+              <Button
+                size="lg"
+                className="bg-spective-accent hover:bg-spective-accent/90"
+                onClick={() => setContactModalOpen(true)}
+              >
+                Let's discuss how we can apply this to your project <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Contact Modal */}
+      <ContactModal
+        isOpen={contactModalOpen}
+        onClose={() => setContactModalOpen(false)}
+      />
     </Layout>
   );
 };
