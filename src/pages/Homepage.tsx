@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
@@ -5,10 +6,12 @@ import { ArrowRight, Target, Award, Users, Briefcase, Globe, Lightbulb, Trending
 import { Layout } from '@/components/layout/Layout';
 import { useHomepageServices } from '@/hooks/use-homepage-services';
 import { usePortfolioItems } from '@/hooks/use-portfolio-items';
+import { ContactModal } from '@/components/ContactModal';
 
 export const Homepage = () => {
   const { services, loading: servicesLoading } = useHomepageServices();
   const { items: portfolioItems, loading: portfolioLoading } = usePortfolioItems();
+  const [contactModalOpen, setContactModalOpen] = useState(false);
 
   // Available icons mapping
   const iconMap = {
@@ -47,37 +50,43 @@ export const Homepage = () => {
           <div className="absolute bottom-20 right-20 w-28 h-28 bg-white rotate-45"></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-gray-200 rotate-12"></div>
         </div>
-        
+
         <div className="container mx-auto px-6 text-center relative z-10">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6">Spective</h1>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6">SPECTIVE</h1>
           <p className="text-xl md:text-2xl text-gray-300 italic">
-            Your Partner in Success through Unique Perspective
+            We deliver projects — on time, on budget, audit-ready.
           </p>
         </div>
       </section>
 
       {/* Section 1 - Introduction */}
-      <section className="py-20 bg-background">
+      <section className="py-10 bg-background">
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold mb-6">Welcome to Spective</h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Welcome to Spective, a trusted project management consulting firm dedicated to supporting automotive and manufacturing companies in achieving operational excellence.
+                Spective is a project consulting company helping organizations execute complex projects with structure, transparency, and measurable results.
               </p>
-              <p className="text-lg text-muted-foreground mb-8">
-                Our mission is to connect clients with highly skilled professionals who possess the specialized knowledge and industry expertise required to drive complex projects to success. Beyond providing expert resources, we deliver a comprehensive project management framework designed to ensure structure, transparency, and control throughout every phase of the project lifecycle.
-              </p>
-              <Button asChild size="lg" className="bg-spective-accent hover:bg-spective-accent/90">
-                <Link to="/professionals">
-                  Explore Our Professionals <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
+              <div className="flex flex-col gap-1 md:flex-row">
+                <Button asChild size="lg" variant="outline" className="mr-4">
+                  <a href="#portfolio">
+                    See our project portfolio
+                  </a>
+                </Button>
+                <Button 
+                  size="lg" 
+                  className="bg-spective-accent hover:bg-spective-accent/90"
+                  onClick={() => setContactModalOpen(true)}
+                >
+                  Let's discuss your next project <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
+
             </div>
             <div className="flex justify-center">
-              <img 
-                src="/images/team.jpeg" 
-                alt="Professional team" 
+              <img
+                src="/images/team.jpeg"
+                alt="Professional team"
                 className="rounded-lg w-full max-w-md"
               />
             </div>
@@ -125,9 +134,9 @@ export const Homepage = () => {
           <h2 className="text-3xl font-bold mb-12">About Us</h2>
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <img 
-                src="/images/us.jpeg" 
-                alt="About Spective" 
+              <img
+                src="/images/us.jpeg"
+                alt="About Spective"
                 className="rounded-lg w-full"
               />
             </div>
@@ -141,7 +150,7 @@ export const Homepage = () => {
       </section>
 
       {/* Section 4 - Project Portfolio */}
-      <section className="py-20 bg-background">
+      <section className="py-20 bg-background" id="portfolio">
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-bold mb-12">Our Project Portfolio</h2>
           {portfolioLoading ? (
@@ -176,9 +185,9 @@ export const Homepage = () => {
           <div className="flex flex-wrap justify-center items-center gap-12 opacity-80">
             {partners.map((partner) => (
               <div key={partner.name} className="w-32 h-16 rounded flex items-center justify-center">
-                <img 
-                  src={partner.logo} 
-                  alt={partner.name} 
+                <img
+                  src={partner.logo}
+                  alt={partner.name}
                   className="h-10 w-auto object-contain"
                 />
               </div>
@@ -198,8 +207,12 @@ export const Homepage = () => {
               </p>
             </div>
             <div className="text-center md:text-right">
-              <Button size="lg" className="bg-spective-accent hover:bg-spective-accent/90">
-                <a href="#footer">Get Started</a>
+              <Button 
+                size="lg" 
+                className="bg-spective-accent hover:bg-spective-accent/90"
+                onClick={() => setContactModalOpen(true)}
+              >
+                Get Started
               </Button>
             </div>
           </div>
@@ -220,9 +233,9 @@ export const Homepage = () => {
               </p>
             </div>
             <div className="flex justify-center">
-              <img 
-                src="/images/success.jpeg" 
-                alt="Our vision" 
+              <img
+                src="/images/success.jpeg"
+                alt="Our vision"
                 className="rounded-lg w-full max-w-md"
               />
             </div>
@@ -259,9 +272,9 @@ export const Homepage = () => {
               </p>
             </div>
             <div className="flex justify-center">
-              <img 
-                src="/images/partnership.jpeg" 
-                alt="Partnership" 
+              <img
+                src="/images/partnership.jpeg"
+                alt="Partnership"
                 className="rounded-lg w-full max-w-md"
               />
             </div>
@@ -280,8 +293,12 @@ export const Homepage = () => {
               </p>
             </div>
             <div className="text-center md:text-right">
-              <Button size="lg" className="bg-spective-accent hover:bg-spective-accent/90">
-                <a href="#footer">Contact Us</a>
+              <Button 
+                size="lg" 
+                className="bg-spective-accent hover:bg-spective-accent/90"
+                onClick={() => setContactModalOpen(true)}
+              >
+                Contact Us
               </Button>
             </div>
           </div>
@@ -309,6 +326,12 @@ export const Homepage = () => {
           </div>
         </div>
       </section>
+
+      {/* Contact Modal */}
+      <ContactModal
+        isOpen={contactModalOpen}
+        onClose={() => setContactModalOpen(false)}
+      />
     </Layout>
   );
 };
