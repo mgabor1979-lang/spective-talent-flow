@@ -5,13 +5,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { SearchBar, SearchGroup } from '@/components/ui/SearchBar';
 import { GoToTop } from '@/components/ui/GoToTop';
-import { User, Loader2 } from 'lucide-react';
+import { User, Loader2, ArrowDownAZ } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { supabase } from '@/integrations/supabase/client';
 import { DATA_SEPARATORS } from '@/lib/data-separators';
 import { formatDistance, batchCalculateDistances } from '@/lib/distance-utils';
 import { isCompanyUser } from '@/lib/auth-utils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Fuse from 'fuse.js';
 
 interface Professional {
@@ -32,6 +33,8 @@ interface Professional {
   available_from?: string;
   profile_image?: string;
 }
+
+type SortBy = 'default' | 'relevance' | 'distance' | 'availability';
 
 // Helper function to calculate age
 const calculateAge = (birthDate: string): number => {
@@ -157,6 +160,7 @@ export const Professionals = () => {
   const [loading, setLoading] = useState(true);
   const [isCompany, setIsCompany] = useState(false);
   const [companyAddress, setCompanyAddress] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<SortBy>('default');
 
   useEffect(() => {
     const checkAuthAndFetchProfessionals = async () => {
@@ -166,14 +170,14 @@ export const Professionals = () => {
         if (session?.user) {
           const companyUser = await isCompanyUser(session.user.id);
           setIsCompany(companyUser);
-          
+
           if (companyUser) {
             const { data: companyProfile } = await supabase
               .from('company_profiles')
               .select('address')
               .eq('user_id', session.user.id)
               .single();
-            
+
             if (companyProfile?.address) {
               setCompanyAddress(companyProfile.address);
             }
@@ -211,7 +215,7 @@ export const Professionals = () => {
         if (isCompany && companyAddress) {
           const professionalCities = transformedData.map(p => p.city).filter(Boolean);
           const distances = await batchCalculateDistances(companyAddress, professionalCities);
-          
+
           const professionalsWithDistance = transformedData.map((professional, index) => {
             if (!professional.city) {
               return professional;
@@ -271,40 +275,104 @@ export const Professionals = () => {
   const filteredProfessionals = useMemo(() => {
     // If no search groups have any badges, return all professionals
     const hasAnySearchTerms = searchGroups.some(group => group.badges.length > 0);
-    
+
+    let filtered: Professional[];
+
     if (!hasAnySearchTerms) {
-      return professionals;
+      filtered = professionals;
+    } else {
+      // Helper function to check if a professional matches a badge
+      const professionalMatchesBadge = (professional: Professional, badge: string): boolean => {
+        const results = fuse.search(badge);
+
+        const matches = results.some(result =>
+          result.item.id === professional.id &&
+          result.score !== undefined &&
+          result.score <= 0.15 // Stricter threshold (was 0.3)
+        );
+
+        return matches;
+      };
+
+      // Helper function to check if a professional matches a group (OR logic)
+      const professionalMatchesGroup = (professional: Professional, group: SearchGroup): boolean => {
+        if (group.badges.length === 0) return true;
+        const matches = group.badges.some(badge => professionalMatchesBadge(professional, badge));
+        return matches;
+      };
+
+      // Filter professionals based on search groups with AND/OR logic
+      filtered = professionals.filter(professional => {
+        // Each group is ANDed together
+        const matches = searchGroups.every(group => professionalMatchesGroup(professional, group));
+        return matches;
+      });
     }
 
-    // Helper function to check if a professional matches a badge
-    const professionalMatchesBadge = (professional: Professional, badge: string): boolean => {
-      const results = fuse.search(badge);
-      
-      const matches = results.some(result => 
-        result.item.id === professional.id && 
-        result.score !== undefined && 
-        result.score <= 0.15 // Stricter threshold (was 0.3)
-      );
-      
-      return matches;
+    // Apply sorting
+    const sorted = [...filtered];
+
+    // Helper function for secondary A-Z sorting by name
+    const sortByName = (a: Professional, b: Professional) => {
+      return a.full_name.localeCompare(b.full_name);
     };
 
-    // Helper function to check if a professional matches a group (OR logic)
-    const professionalMatchesGroup = (professional: Professional, group: SearchGroup): boolean => {
-      if (group.badges.length === 0) return true;
-      const matches = group.badges.some(badge => professionalMatchesBadge(professional, badge));
-      return matches;
-    };
+    if (sortBy === 'relevance' && hasAnySearchTerms) {
+      // Sort by relevance (search score)
+      sorted.sort((a, b) => {
+        const searchTerms = searchGroups.flatMap(group => group.badges);
 
-    // Filter professionals based on search groups with AND/OR logic
-    const filtered = professionals.filter(professional => {
-      // Each group is ANDed together
-      const matches = searchGroups.every(group => professionalMatchesGroup(professional, group));
-      return matches;
-    });
-    
-    return filtered;
-  }, [professionals, searchGroups, fuse]);
+        // Calculate average score for each professional
+        const getAverageScore = (professional: Professional) => {
+          const scores = searchTerms.map(term => {
+            const results = fuse.search(term);
+            const match = results.find(r => r.item.id === professional.id);
+            return match?.score ?? 1; // Lower score is better
+          });
+          return scores.reduce((sum, score) => sum + score, 0) / scores.length;
+        };
+
+        const scoreA = getAverageScore(a);
+        const scoreB = getAverageScore(b);
+
+        return scoreA - scoreB; // Lower score first
+      });
+    } else if (sortBy === 'distance' && isCompany) {
+      // Sort by distance (closest first), then A-Z
+      sorted.sort((a, b) => {
+        const distA = a.distance ?? Infinity;
+        const distB = b.distance ?? Infinity;
+
+        if (distA !== distB) {
+          return distA - distB;
+        }
+        return sortByName(a, b);
+      });
+    } else if (sortBy === 'availability') {
+      // Sort by availability (available now first, then by available_from date, then unavailable), then A-Z
+      sorted.sort((a, b) => {
+        // Available now = 0, available from date = timestamp, unavailable = Infinity
+        const getAvailabilityValue = (prof: Professional) => {
+          if (prof.available) return 0;
+          if (prof.available_from) return new Date(prof.available_from).getTime();
+          return Infinity;
+        };
+
+        const availA = getAvailabilityValue(a);
+        const availB = getAvailabilityValue(b);
+
+        if (availA !== availB) {
+          return availA - availB;
+        }
+        return sortByName(a, b);
+      });
+    } else {
+      // Default: sort by name A-Z (when sortBy is 'default' or any other value)
+      sorted.sort(sortByName);
+    }
+
+    return sorted;
+  }, [professionals, searchGroups, fuse, sortBy, isCompany]);
 
   if (loading) {
     return (
@@ -333,16 +401,41 @@ export const Professionals = () => {
       </section>
 
       <div className="container mx-auto px-6 py-12">
-        {/* Search */}
-        <SearchBar
-          searchGroups={searchGroups}
-          onSearchGroupsChange={setSearchGroups}
-          placeholder="Type and press Enter to add search terms..."
-          resultsCount={filteredProfessionals.length}
-          showResultsCount={true}
-          className="mb-8"
-          storageKey="professionals-search-groups"
-        />
+        {/* Search and Sorting */}
+        <div className="mb-8 flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
+          {/* Search - 10 parts on desktop */}
+          <div className="flex-1 lg:w-9/12">
+            <SearchBar
+              searchGroups={searchGroups}
+              onSearchGroupsChange={setSearchGroups}
+              placeholder="Type and press Enter to add search terms..."
+              resultsCount={filteredProfessionals.length}
+              showResultsCount={true}
+              storageKey="professionals-search-groups"
+            />
+          </div>
+
+          {/* Sorting - 2 parts on desktop */}
+          <div className="lg:w-3/12 flex flex-col items-end justify-end gap-3">
+            <div className="flex items-center gap-2">
+              <ArrowDownAZ className="h-5 w-5 text-spective-accent" />
+              <h2 className="text-lg font-semibold">Sorting</h2>
+            </div>
+            <div className="flex full-width flex-row items-center justify-end gap-3">
+              <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
+                <SelectTrigger id="sort-select" className="w-[200px]">
+                  <SelectValue placeholder="Name (A-Z)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="default">Name (A-Z)</SelectItem>
+                  <SelectItem value="relevance">Relevance</SelectItem>
+                  {isCompany && <SelectItem value="distance">Distance</SelectItem>}
+                  <SelectItem value="availability">Availability</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
 
         {/* Professionals Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -354,10 +447,10 @@ export const Professionals = () => {
             const surname = getSurname(professional.full_name);
 
             return (
-              <Card key={professional.id} className="h-full hover:shadow-lg transition-shadow">
+              <Card key={professional.id} className={`h-full hover:shadow-lg transition-shadow ${!professional.available ? 'bg-gray-100' : ''}`}>
                 <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex items-center space-x-4 mb-4">
-                    <Avatar className="h-16 w-16">
+                    <Avatar className={`h-16 w-16 ${!professional.available ? 'grayscale' : ''}`}>
                       <AvatarImage src={professional.profile_image || undefined} />
                       <AvatarFallback className="bg-spective-accent text-white text-lg">
                         {surname.charAt(0)}
@@ -365,23 +458,27 @@ export const Professionals = () => {
                     </Avatar>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-semibold">{firstName}</h3>
+                        <Link to={`/profile/${professional.user_id}`} className="text-black hover:text-black">
+                          <h3 className="text-xl font-semibold">{firstName}</h3>
+                        </Link>
                         {/* Availability indicator */}
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <div 
-                                className={`w-3 h-3 rounded-full border border-white transition-all ${
-                                  professional.available 
-                                    ? 'bg-green-500 shadow-lg shadow-green-500/50' 
+                              <div
+                                className={`w-3 h-3 rounded-full border border-white transition-all ${professional.available
+                                    ? 'bg-green-500 shadow-lg shadow-green-500/50'
                                     : 'bg-red-500 shadow-lg shadow-red-500/50'
-                                }`}
+                                  }`}
                               />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>
+                              <p className="font-semibold">
+                                {professional.available ? 'Available Now' : 'Not Available'}
+                              </p>
+                              <p className="text-xs mt-1">
                                 {getAvailabilityText(
-                                  professional.available || false, 
+                                  professional.available || false,
                                   professional.available_from || undefined
                                 )}
                               </p>

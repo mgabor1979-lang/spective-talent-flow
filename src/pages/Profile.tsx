@@ -5,7 +5,8 @@ import { Layout } from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import { GoToTop } from '@/components/ui/GoToTop';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
@@ -26,7 +27,7 @@ import { DATA_SEPARATORS } from '@/lib/data-separators';
 import { useFavorites } from '@/hooks/use-favorites';
 import { useProfileImage } from '@/hooks/use-profile-image';
 import { isCompanyUser } from '@/lib/auth-utils';
-import { formatDistance, calculateCachedDistance } from '@/lib/distance-utils';
+import { calculateCachedDistance } from '@/lib/distance-utils';
 import { ImageCropModal } from '@/components/profile/ImageCropModal';
 import { ProfilePictureBadges } from '@/components/profile/ProfilePictureBadges';
 
@@ -163,7 +164,7 @@ const parseEducation = (educationText: string): EducationItem[] => {
   return educations.sort((a, b) => {
     const getStartYear = (duration: string) => {
       const startYearMatch = duration.match(/^(\d{4})/);
-      return startYearMatch ? parseInt(startYearMatch[1]) : 0;
+      return startYearMatch ? Number.parseInt(startYearMatch[1]) : 0;
     };
     
     const startYearA = getStartYear(a.duration);
@@ -198,44 +199,6 @@ const calculateAge = (birthDate: string): number => {
     age--;
   }
   return age;
-};
-
-const formatPhone = (phone: string, isOwner: boolean, isAdmin: boolean): string => {
-  if (isOwner || isAdmin) return phone;
-  return phone.slice(0, 3) + '*'.repeat(phone.length - 3);
-};
-
-const formatEmail = (email: string, isOwner: boolean, isAdmin: boolean): string => {
-  if (isOwner || isAdmin) return email;
-  const [name, domain] = email.split('@');
-  const hiddenName = name.slice(0, 2) + '*'.repeat(name.length - 2);
-  const hiddenDomain = domain.split('.')[0].slice(0, 2) + '*'.repeat(domain.split('.')[0].length - 2) + '.' + domain.split('.')[1];
-  return hiddenName + '@' + hiddenDomain;
-};
-
-const getSkillLevel = (skill: string): number => {
-  // Mock skill levels - in real app this would come from database
-  const levels: { [key: string]: number } = {
-    'Project Management': 90,
-    'Strategic Planning': 85,
-    'Team Leadership': 95,
-    'Digital Transformation': 80,
-    'Process Optimization': 88,
-    'Change Management': 92
-  };
-  return levels[skill] || 70;
-};
-
-const getLanguageLevel = (language: string): string => {
-  // Mock language levels - in real app this would come from database  
-  const levels: { [key: string]: string } = {
-    'English': 'native',
-    'German': 'advanced',
-    'Hungarian': 'native',
-    'French': 'intermediate',
-    'Spanish': 'beginner'
-  };
-  return levels[language] || 'intermediate';
 };
 
 // Helper function to get availability status text
@@ -348,7 +311,7 @@ export const Profile = () => {
           // If company user, fetch company address for distance calculation
           if (companyUser) {
             
-            const { data: companyProfile, error: companyError } = await supabase
+            const { data: companyProfile } = await supabase
               .from('company_profiles')
               .select('address')
               .eq('user_id', session.user.id)
@@ -681,11 +644,7 @@ export const Profile = () => {
   // Extract parsed data
   const { skills, languages, technologies, experienceSummary, workExperiences, educations } = parsedData;
 
-  // Name display logic
-  const displayName = canSeeFullName 
-    ? profileData.full_name 
-    : getFirstName(profileData.full_name); // Show only first name for non-owners/non-admins
-  
+  // Name display logic  
   const displayNameForAvatar = canSeeFullName 
     ? profileData.full_name.split(' ').map(n => n[0]).join('')
     : getSurname(profileData.full_name).charAt(0); // Show only surname initial for avatar
@@ -1163,6 +1122,10 @@ export const Profile = () => {
       {/* Image Lightbox */}
       <Dialog open={!!lightboxImage} onOpenChange={() => setLightboxImage(null)}>
         <DialogContent className="max-w-3xl p-0 bg-black/90 border-none [&>button]:hidden">
+          <VisuallyHidden>
+            <DialogTitle>Profile Image</DialogTitle>
+            <DialogDescription>Full size profile picture preview</DialogDescription>
+          </VisuallyHidden>
           <div className="relative">
             <Button
               onClick={() => setLightboxImage(null)}

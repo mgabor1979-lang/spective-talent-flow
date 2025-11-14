@@ -182,9 +182,9 @@ export const SearchBar = ({
 
       <div className="flex flex-col gap-4">
         {searchGroups.map((group, groupIndex) => (
-          <>
+          <div key={group.id}>
             {groupIndex > 0 && (
-              <div className="flex items-center gap-2 w-full">
+              <div className="flex items-center gap-2 w-full mb-3">
                 <div className="flex-1 h-px bg-border" />
                 <span className="text-xs font-semibold text-muted-foreground px-2 py-1 bg-muted rounded">
                   AND
@@ -192,7 +192,7 @@ export const SearchBar = ({
                 <div className="flex-1 h-px bg-border" />
               </div>
             )}
-            <div key={group.id} className="w-full">
+            <div className="w-full">
               <div className="relative">
                 <div className="flex gap-2">
                   {/* Custom input container with badges inside */}
@@ -240,7 +240,7 @@ export const SearchBar = ({
                 </div>
               </div>
             </div>
-          </>
+          </div>
         ))}
       </div>
 
