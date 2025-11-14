@@ -275,6 +275,7 @@ export const SignupForm = () => {
           .from('professional_profiles')
           .insert({
             user_id: authData.user.id,
+            city: professionalData.city,
             profile_status: 'pending'
           });
 
