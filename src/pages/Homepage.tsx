@@ -294,11 +294,11 @@ export const Homepage = () => {
       </section>
 
       {/* Section 8 - Professionals CTA */}
-      <section className="py-20 bg-spective-light">
+      <section className="py-20">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-6">Our Professionals are Waiting for You</h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Discover our network of experienced interim managers, consultants, and industry experts ready to drive your next transformation project.
+            Discover our network of experienced project managers and industry experts ready to drive your next transformation project.
           </p>
           <Button asChild size="lg" className="bg-spective-accent hover:bg-spective-accent/90">
             <Link to="/professionals">
@@ -308,52 +308,7 @@ export const Homepage = () => {
         </div>
       </section>
 
-      {/* Section 9 - Partner with Spective */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold mb-12 text-center">Partner with Spective</h2>
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="mb-12">
-              <p className="text-lg text-muted-foreground mb-6">
-                and experience the transformative power of our expertise. Let us connect you with professionals who possess the knowledge and skills to drive your success.
-              </p>
-              <p className="text-lg text-muted-foreground">
-                Together, we will navigate challenges, optimize operations, and provide a fresh perspective to help you thrive in the ever-changing business landscape.
-              </p>
-            </div>
-            <div className="flex justify-center">
-              <img
-                src="/images/partnership.jpeg"
-                alt="Partnership"
-                className="rounded-lg w-full max-w-md"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 10 - Final CTA */}
-      <section className="py-20 bg-spective-light">
-        <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Business?</h2>
-              <p className="text-lg text-muted-foreground">
-                Take the first step towards achieving extraordinary results. Our team is ready to discuss how we can support your transformation journey.
-              </p>
-            </div>
-            <div className="text-center md:text-right">
-              <Button
-                size="lg"
-                className="bg-spective-accent hover:bg-spective-accent/90"
-                onClick={() => setContactModalOpen(true)}
-              >
-                Contact Us
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       {/* Section 11 - Join Us */}
       <section className="py-32 bg-background">
