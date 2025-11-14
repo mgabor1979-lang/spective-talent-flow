@@ -516,22 +516,22 @@ export const Profile = () => {
         
         if (!targetUserId) return;
 
-        // Load profile data from direct table queries
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', targetUserId)
-          .single();
+        // Check if this is the current user viewing their own profile
+        const isCurrentUser = targetUserId === session?.user?.id;
 
-        if (profileError) {
-          console.error('Profile query error:', profileError);
-          return;
-        }
+        if (isCurrentUser) {
+          // For own profile, use direct table queries for full access (same as initial load)
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', targetUserId)
+            .single();
 
-        if (profile) {
-          // Check if this is the current user viewing their own profile
-          const isCurrentUser = targetUserId === session?.user?.id;
-          
+          if (profileError) {
+            console.error('Profile query error:', profileError);
+            return;
+          }
+
           // Get professional profile data
           const { data: professionalProfile } = await supabase
             .from('professional_profiles')
@@ -544,34 +544,58 @@ export const Profile = () => {
             Math.floor((Date.now() - new Date(profile.birth_date).getTime()) / (1000 * 60 * 60 * 24 * 365.25)) : 
             undefined;
 
-          // Mask data based on user permissions
-          const isGuest = !session?.user;
-          
           setProfileData({
             id: profile.id,
             user_id: profile.user_id,
-            full_name: isGuest ? 
-              // For guests: return only last part of name (keresztnév)
-              profile.full_name.split(' ').pop() || profile.full_name :
-              profile.full_name,
-            email: isCurrentUser ? profile.email : 
-              isGuest ? '' : 
-              profile.email.substring(0, 3) + '***@' + profile.email.split('@')[1],
-            phone: isCurrentUser ? profile.phone : undefined,
-            birth_date: isGuest ? undefined : profile.birth_date,
-            age: isGuest ? undefined : age,
+            full_name: profile.full_name,
+            email: profile.email,
+            phone: profile.phone,
+            birth_date: profile.birth_date,
+            age: age,
             role: profile.role,
             professional_profile: professionalProfile ? {
-              daily_wage_net: isCurrentUser ? professionalProfile.daily_wage_net : 'Contact for details',
+              daily_wage_net: professionalProfile.daily_wage_net,
               work_experience: professionalProfile.work_experience,
               education: professionalProfile.education || null,
               skills: professionalProfile.skills || [],
               languages: professionalProfile.languages || [],
               technologies: professionalProfile.technologies || [],
-              range: professionalProfile.range || null,
-              available: professionalProfile.available || null,
-              availablefrom: professionalProfile.availablefrom || null
+              city: professionalProfile.city || "",
+              available: professionalProfile.available,
+              availablefrom: professionalProfile.availablefrom,
             } : undefined
+          });
+        } else {
+          // For viewing other profiles, use the public function with proper data masking
+          const { data: publicProfile, error: publicProfileError } = await supabase
+            .rpc('get_profile_for_public', { _user_id: targetUserId });
+
+          if (publicProfileError || !publicProfile || publicProfile.length === 0) {
+            return;
+          }
+
+          const profile = publicProfile[0];
+          setProfileData({
+            id: profile.id,
+            user_id: profile.user_id,
+            full_name: profile.masked_full_name,
+            email: profile.masked_email || '',
+            phone: profile.masked_phone,
+            birth_date: profile.birth_date,
+            age: profile.age,
+            role: profile.role,
+            professional_profile: {
+              daily_wage_net: profile.masked_daily_wage,
+              work_experience: profile.work_experience,
+              education: profile.education || null,
+              skills: profile.skills || [],
+              languages: profile.languages || [],
+              technologies: profile.technologies || [],
+              city: profile.city || "",
+              available: profile.available,
+              availablefrom: profile.availablefrom,
+              range: profile.range,
+            }
           });
         }
       } catch (error) {
@@ -1028,7 +1052,9 @@ export const Profile = () => {
             profileData={{
               ...profileData,
               professional_profile: {
-                daily_wage_net: typeof profileData.professional_profile?.daily_wage_net === 'string' ? 0 : profileData.professional_profile?.daily_wage_net,
+                daily_wage_net: typeof profileData.professional_profile?.daily_wage_net === 'number' 
+                  ? profileData.professional_profile.daily_wage_net 
+                  : Number(profileData.professional_profile?.daily_wage_net) || 0,
                 city: profileData.professional_profile?.city
               }
             }}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, User, LogOut, Shield } from 'lucide-react';
+import { Menu, X, User, LogOut, Shield, Building, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { User as SupabaseUser } from '@supabase/supabase-js';
@@ -19,7 +19,7 @@ export const Header = () => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
-      
+
       // Check admin status and company status
       if (session?.user) {
         const { data: roles } = await supabase
@@ -27,7 +27,7 @@ export const Header = () => {
           .select('role')
           .eq('user_id', session.user.id);
         setIsAdmin(roles?.some(r => r.role === 'admin') || false);
-        
+
         // Check if user is a company user
         const isCompanyUserResult = await isCompanyUser(session.user.id);
         setIsCompany(isCompanyUserResult);
@@ -40,7 +40,7 @@ export const Header = () => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      
+
       // Use setTimeout to prevent potential deadlock when calling Supabase inside auth callback
       if (session?.user) {
         setTimeout(async () => {
@@ -49,7 +49,7 @@ export const Header = () => {
             .select('role')
             .eq('user_id', session.user.id);
           setIsAdmin(roles?.some(r => r.role === 'admin') || false);
-          
+
           // Check if user is a company user
           const isCompanyUserResult = await isCompanyUser(session.user.id);
           setIsCompany(isCompanyUserResult);
@@ -110,11 +110,10 @@ export const Header = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  isActive(item.path) 
-                    ? 'text-primary border-b-2 border-primary pb-1' 
+                className={`text-sm font-medium transition-colors hover:text-primary ${isActive(item.path)
+                    ? 'text-primary border-b-2 border-primary pb-1'
                     : 'text-muted-foreground'
-                }`}
+                  }`}
               >
                 {item.name}
               </Link>
@@ -129,13 +128,17 @@ export const Header = () => {
                     </Button>
                   </Link>
                 )}
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={handleProfileClick}
                   className="flex items-center space-x-2"
                 >
-                  <User className="h-4 w-4" />
+                  {isCompany ? (
+                    <Building2 className="h-4 w-4" />
+                  ) : (
+                    <User className="h-4 w-4" />
+                  )}
                   <span className="text-sm">{user.user_metadata?.full_name || user.email}</span>
                 </Button>
                 <Button variant="ghost" size="sm" onClick={handleSignOut} className="flex items-center space-x-2">
@@ -165,11 +168,10 @@ export const Header = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`text-sm font-medium px-2 py-1 rounded transition-colors ${
-                    isActive(item.path) 
-                      ? 'text-primary bg-muted' 
+                  className={`text-sm font-medium px-2 py-1 rounded transition-colors ${isActive(item.path)
+                      ? 'text-primary bg-muted'
                       : 'text-muted-foreground hover:text-primary hover:bg-muted'
-                  }`}
+                    }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.name}
@@ -185,9 +187,9 @@ export const Header = () => {
                       </div>
                     </Link>
                   )}
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => {
                       handleProfileClick();
                       setIsMenuOpen(false);
@@ -197,9 +199,9 @@ export const Header = () => {
                     <User className="h-4 w-4 mr-2" />
                     <span className="text-sm font-medium">{user.user_metadata?.full_name || user.email}</span>
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={handleSignOut}
                     className="w-full justify-start px-2 py-1 h-auto"
                   >

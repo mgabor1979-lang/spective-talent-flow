@@ -85,12 +85,12 @@ export const InfoCard = ({
           {profileData.professional_profile?.daily_wage_net && profileData.professional_profile.daily_wage_net !== '****' && (
             <div className="flex items-center space-x-3">
               <Euro className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">{profileData.professional_profile.daily_wage_net}</span>
+              <span className="text-sm">{Number.parseFloat(profileData.professional_profile.daily_wage_net as string)} / day</span>
             </div>
           )}
 
           {!isCompany && profileData.professional_profile?.city && (
-            <div className="flex items-center space-x-3 p-2">
+            <div className="flex items-center space-x-3">
               <MapPin className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm">{profileData.professional_profile.city}</span>
             </div>
@@ -98,17 +98,17 @@ export const InfoCard = ({
 
           {/* Distance display for company users only */}
           {isCompany && !isOwner && distance !== null && (
-            <div className="flex items-center space-x-3 bg-emerald-50 p-2 rounded-md">
+            <div className="flex items-center space-x-3 bg-emerald-50 rounded-md">
               <MapPin className="h-4 w-4 text-emerald-500" />
               <span className="text-sm text-emerald-600 font-medium">
-                {formatDistance(distance)} away from {companyAddress} 
+                {formatDistance(distance)} away
               </span>
             </div>
           )}
 
           {/* Distance loading indicator */}
           {isCompany && !isOwner && distanceLoading && distance === null && (
-            <div className="flex items-center space-x-3 bg-gray-50 p-2 rounded-md">
+            <div className="flex items-center space-x-3 bg-gray-50 rounded-md">
               <MapPin className="h-4 w-4 text-muted-foreground animate-pulse" />
               <span className="text-sm text-muted-foreground">
                 🔄 Calculating distance...

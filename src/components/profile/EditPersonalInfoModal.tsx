@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,10 +27,29 @@ export const EditPersonalInfoModal = ({ isOpen, onClose, profileData, onUpdate }
   const [fullName, setFullName] = useState(profileData.full_name);
   const [phone, setPhone] = useState(profileData.phone || '');
   const [birthDate, setBirthDate] = useState(profileData.birth_date || '');
-  const [dailyWage, setDailyWage] = useState(profileData.professional_profile?.daily_wage_net?.toString() || '');
+  const [dailyWage, setDailyWage] = useState(
+    profileData.professional_profile?.daily_wage_net 
+      ? profileData.professional_profile.daily_wage_net.toString() 
+      : ''
+  );
   const [city, setCity] = useState(profileData.professional_profile?.city || '');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+
+  // Update form fields when profileData changes or modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setFullName(profileData.full_name);
+      setPhone(profileData.phone || '');
+      setBirthDate(profileData.birth_date || '');
+      setDailyWage(
+        profileData.professional_profile?.daily_wage_net 
+          ? profileData.professional_profile.daily_wage_net.toString() 
+          : ''
+      );
+      setCity(profileData.professional_profile?.city || '');
+    }
+  }, [isOpen, profileData]);
 
   const handleSave = async () => {
     setLoading(true);

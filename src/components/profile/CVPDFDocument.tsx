@@ -377,9 +377,9 @@ export const CVPDFDocument = ({ profileData, parsedData, options, profileImage }
         }
         
         if (typeof wage === 'number') {
-            return `${wage.toLocaleString()} HUF/day`;
+            return `${wage.toLocaleString()} EUR/day`;
         }
-        return wage?.toString() || 'N/A';
+        return wage?.toString() + ' EUR/day' || 'N/A';
     };
 
     const displayName = options.hideName

@@ -98,11 +98,6 @@ const ProfessionalCard = ({ professional, isFavorite, onToggleFavorite, onCardCl
               </div>
             </div>
           </div>
-          {professional.daily_wage_net ? (
-            <p className="text-sm text-gray-600">
-              Daily Rate: ${professional.daily_wage_net}
-            </p>
-          ) : null}
 
         </div>
         <Button

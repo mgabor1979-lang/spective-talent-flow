@@ -46,9 +46,9 @@ export const CVDocument = ({ profileData, parsedData, options, profileImage }: C
     }
     
     if (typeof wage === 'number') {
-      return `${wage.toLocaleString()} HUF/day`;
+      return `${wage.toLocaleString()} EUR/day`;
     }
-    return wage?.toString() || 'N/A';
+    return wage?.toString() + ' EUR/day' || 'N/A';
   };
 
   const displayName = options.hideName 
