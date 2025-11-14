@@ -73,8 +73,8 @@ export const Homepage = () => {
                     See our project portfolio
                   </a>
                 </Button>
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="bg-spective-accent hover:bg-spective-accent/90"
                   onClick={() => setContactModalOpen(true)}
                 >
@@ -131,7 +131,7 @@ export const Homepage = () => {
       {/* Section 3 - About Us */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold mb-12">About Us</h2>
+          <h2 className="text-3xl font-bold mb-12">About Spective</h2>
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <img
@@ -142,7 +142,13 @@ export const Homepage = () => {
             </div>
             <div>
               <p className="text-lg text-muted-foreground mb-6">
-                Spective was founded in 2021 with the aim of providing specialized project management consulting services to the automotive and manufacturing industries. Since our inception, we have achieved steady and sustainable growth, supported by the successful delivery of complex and high-value projects for our clients.
+                Spective is a project management consulting company specializing in industrial and manufacturing projects.
+              </p>
+              <p className="text-lg text-muted-foreground mb-6">
+                We connect clients with highly skilled professionals and provide a structured project management framework that ensures transparency, control, and professional oversight throughout the entire project lifecycle.
+              </p>
+              <p className="text-lg text-muted-foreground mb-6">
+                Our approach guarantees that every project is executed efficiently, on time, and in compliance with all quality and budget expectations.
               </p>
             </div>
           </div>
@@ -207,8 +213,8 @@ export const Homepage = () => {
               </p>
             </div>
             <div className="text-center md:text-right">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-spective-accent hover:bg-spective-accent/90"
                 onClick={() => setContactModalOpen(true)}
               >
@@ -293,8 +299,8 @@ export const Homepage = () => {
               </p>
             </div>
             <div className="text-center md:text-right">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-spective-accent hover:bg-spective-accent/90"
                 onClick={() => setContactModalOpen(true)}
               >
