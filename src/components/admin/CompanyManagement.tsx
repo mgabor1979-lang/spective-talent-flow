@@ -19,12 +19,10 @@ import {
   Search,
   Filter,
   ExternalLink,
-  FileText,
   Trash2,
   Phone
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { DocumentManagement } from './DocumentManagement';
 
 interface CompanyProfile {
   id: string;
@@ -363,10 +361,6 @@ export const CompanyManagement = () => {
           <Building2 className="h-4 w-4" />
           Companies
         </TabsTrigger>
-        <TabsTrigger value="documents" className="flex items-center gap-2">
-          <FileText className="h-4 w-4" />
-          Documents
-        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="companies" className="space-y-6">
@@ -673,9 +667,6 @@ export const CompanyManagement = () => {
         )}
       </TabsContent>
 
-      <TabsContent value="documents">
-        <DocumentManagement />
-      </TabsContent>
     </Tabs>
   );
 };

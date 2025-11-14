@@ -5,13 +5,11 @@ import { Layout } from '@/components/layout/Layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Heart, Eye, FileText, Settings, MapPin, CheckCircle, XCircle } from 'lucide-react';
+import { Heart, Eye, Settings, MapPin, CheckCircle, XCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { isApprovedCompanyUser } from '@/lib/auth-utils';
 import { useFavorites } from '@/hooks/use-favorites';
-import { CompanyFileManager } from '@/components/admin/CompanyFileManager';
 import { EditCompanyProfileModal } from '@/components/company/EditCompanyProfileModal';
 import { formatDistance, batchCalculateDistances } from '@/lib/distance-utils';
 
@@ -354,7 +352,7 @@ export const CompanyDashboard = () => {
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold mb-2">Company Dashboard</h1>
-            <p className="text-gray-600">Manage your favorite professionals and access shared documents</p>
+            <p className="text-gray-600">Manage your favorite professionals</p>
           </div>
           <Button
             variant="outline"
@@ -366,52 +364,33 @@ export const CompanyDashboard = () => {
           </Button>
         </div>
 
-        <Tabs defaultValue="favorites" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="favorites" className="flex items-center gap-2">
-              <Heart className="h-4 w-4" />
-              Favorite Professionals
-            </TabsTrigger>
-            <TabsTrigger value="documents" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Document Library
-            </TabsTrigger>
-          </TabsList>
+        <div>
+          <div className="mb-4">
+            <h2 className="text-xl font-semibold">Your Favorite Professionals</h2>
+            <p className="text-gray-600 text-sm">
+              Professionals you've marked as favorites. Contact our admin team to get in touch.
+            </p>
+          </div>
 
-          <TabsContent value="favorites" className="mt-6">
-            <div>
-              <div className="mb-4">
-                <h2 className="text-xl font-semibold">Your Favorite Professionals</h2>
-                <p className="text-gray-600 text-sm">
-                  Professionals you've marked as favorites. Contact our admin team to get in touch.
-                </p>
-              </div>
-
-              {favorites.length === 0 ? (
-                <Card className="p-8 text-center">
-                  <Heart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-600">No favorites yet. Contact our admin team to add professionals to your favorites.</p>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {favorites.map(professional => (
-                    <ProfessionalCard
-                      key={professional.id}
-                      professional={professional}
-                      isFavorite={true}
-                      onToggleFavorite={toggleFavorite}
-                      onCardClick={handleProfessionalClick}
-                    />
-                  ))}
-                </div>
-              )}
+          {favorites.length === 0 ? (
+            <Card className="p-8 text-center">
+              <Heart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-600">No favorites yet. Contact our admin team to add professionals to your favorites.</p>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {favorites.map(professional => (
+                <ProfessionalCard
+                  key={professional.id}
+                  professional={professional}
+                  isFavorite={true}
+                  onToggleFavorite={toggleFavorite}
+                  onCardClick={handleProfessionalClick}
+                />
+              ))}
             </div>
-          </TabsContent>
-
-          <TabsContent value="documents" className="mt-6">
-            <CompanyFileManager />
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
 
         {/* Edit Profile Modal */}
         <EditCompanyProfileModal

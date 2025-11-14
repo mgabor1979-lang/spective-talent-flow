@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, User, LogOut, Shield, Building, Building2 } from 'lucide-react';
+import { Menu, X, User, LogOut, Shield, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { User as SupabaseUser } from '@supabase/supabase-js';
@@ -89,6 +89,8 @@ export const Header = () => {
 
   const authNavItems = user ? [
     ...publicNavItems,
+    // Add Document Library for professionals and admins (not companies)
+    ...(isCompany ? [] : [{ name: 'Document Library', path: '/document-library' }]),
   ] : [
     ...publicNavItems,
     { name: 'Login', path: '/login' },

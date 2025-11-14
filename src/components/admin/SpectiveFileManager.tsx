@@ -136,7 +136,7 @@ export const getFileTypeName = (mimeType: string | null, fileName: string): stri
   return 'File';
 };
 
-export const CompanyFileManager = () => {
+export const SpectiveFileManager = () => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState<string | null>(null);
@@ -151,59 +151,13 @@ export const CompanyFileManager = () => {
 
       if (error) {
         console.error('Error fetching documents:', error);
-        // Show sample data if database is not available
-        const sampleDocuments: Document[] = [
-          {
-            id: '1',
-            file_id: 'sample-1',
-            file_name: 'Company Handbook 2025.pdf',
-            file_url: '#',
-            file_size: 2048576, // 2MB
-            mime_type: 'application/pdf',
-            uploaded_by: 'admin',
-            created_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-            updated_at: new Date(Date.now() - 86400000).toISOString(),
-          },
-          {
-            id: '2',
-            file_id: 'sample-2',
-            file_name: 'Project Requirements.docx',
-            file_url: '#',
-            file_size: 512000, // 500KB
-            mime_type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            uploaded_by: 'admin',
-            created_at: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-            updated_at: new Date(Date.now() - 172800000).toISOString(),
-          },
-          {
-            id: '3',
-            file_id: 'sample-3',
-            file_name: 'Budget Spreadsheet Q1.xlsx',
-            file_url: '#',
-            file_size: 1048576, // 1MB
-            mime_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            uploaded_by: 'admin',
-            created_at: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
-            updated_at: new Date(Date.now() - 259200000).toISOString(),
-          },
-          {
-            id: '4',
-            file_id: 'sample-4',
-            file_name: 'Team Photo.jpg',
-            file_url: '#',
-            file_size: 3145728, // 3MB
-            mime_type: 'image/jpeg',
-            uploaded_by: 'admin',
-            created_at: new Date(Date.now() - 345600000).toISOString(), // 4 days ago
-            updated_at: new Date(Date.now() - 345600000).toISOString(),
-          }
-        ];
-        setDocuments(sampleDocuments);
         toast({
-          title: "Demo Mode",
-          description: "Showing sample documents (database not connected)",
-          variant: "default",
+          title: "Error",
+          description: "Failed to fetch documents",
+          variant: "destructive",
         });
+        setDocuments([]);
+        
         return;
       }
 
