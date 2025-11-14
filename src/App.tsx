@@ -13,6 +13,7 @@ import { NewAuth } from "./pages/NewAuth";
 import { Admin } from "./pages/Admin";
 import { CompanyRegister } from "./pages/CompanyRegister";
 import { CompanyDashboard } from "./pages/CompanyDashboard";
+import DocumentLibrary from "./pages/DocumentLibrary";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/company-register" element={<CompanyRegister />} />
           <Route path="/company-dashboard" element={<CompanyDashboard />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/document-library" element={<DocumentLibrary />} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>

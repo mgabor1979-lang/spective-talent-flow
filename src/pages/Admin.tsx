@@ -10,13 +10,16 @@ import { UserManagement } from '@/components/admin/UserManagement';
 import { ContactManagement } from '@/components/admin/ContactManagement';
 import { CompanyManagement } from '@/components/admin/CompanyManagement';
 import { SiteSettings } from '@/components/admin/SiteSettings';
-import { 
-  BarChart3, 
-  Users, 
-  MessageSquare, 
+import { DocumentManagement } from '@/components/admin/DocumentManagement';
+
+import {
+  BarChart3,
+  Users,
+  MessageSquare,
   Settings,
   Building2,
-  Shield
+  Shield,
+  FileText
 } from 'lucide-react';
 
 export const Admin = () => {
@@ -24,14 +27,14 @@ export const Admin = () => {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   // Valid tab values
-  const validTabs = ['dashboard', 'users', 'companies', 'contacts', 'settings'];
-  
+  const validTabs = ['dashboard', 'users', 'documents', 'companies', 'contacts', 'settings'];
+
   // Get current tab from URL, default to 'dashboard'
   const urlTab = searchParams.get('tab');
   const currentTab = urlTab && validTabs.includes(urlTab) ? urlTab : 'dashboard';
-  
+
   // Handle tab change and update URL
   const handleTabChange = (value: string) => {
     if (validTabs.includes(value)) {
@@ -102,7 +105,7 @@ export const Admin = () => {
 
         {/* Admin Tabs */}
         <Tabs value={currentTab} onValueChange={handleTabChange} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="dashboard" className="flex items-center space-x-2">
               <BarChart3 className="h-4 w-4" />
               <span>Dashboard</span>
@@ -110,6 +113,10 @@ export const Admin = () => {
             <TabsTrigger value="users" className="flex items-center space-x-2">
               <Users className="h-4 w-4" />
               <span>Users</span>
+            </TabsTrigger>
+            <TabsTrigger value='documents' className="flex items-center space-x-2">
+              <FileText className="h-4 w-4" />
+              <span>Documents</span>
             </TabsTrigger>
             <TabsTrigger value="companies" className="flex items-center space-x-2">
               <Building2 className="h-4 w-4" />
@@ -133,6 +140,10 @@ export const Admin = () => {
             <UserManagement />
           </TabsContent>
 
+          <TabsContent value="documents">
+            <DocumentManagement />
+          </TabsContent>
+          
           <TabsContent value="companies">
             <CompanyManagement />
           </TabsContent>

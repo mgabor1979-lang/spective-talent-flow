@@ -9,7 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { supabase } from '@/integrations/supabase/client';
 import { Upload, Download, Trash2, FileText } from 'lucide-react';
 import { toast } from 'sonner';
-import { getFileTypeName } from './CompanyFileManager';
+import { getFileTypeName } from './SpectiveFileManager';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 interface Document {
